@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="category_icon">
+        <item>@drawable/ic_category1</item>
+        <item>@drawable/ic_category2</item>
+        <item>@drawable/ic_category3</item>
+        <item>@drawable/ic_category4</item>
+        <item>@drawable/ic_category5</item>
+        <item>@drawable/ic_category6</item>
+        <item>@drawable/ic_category7</item>
+        <item>@drawable/ic_category8</item>
+        <item>@drawable/ic_category9</item>
+        <item>@drawable/ic_category10</item>
+        <item>@drawable/ic_category11</item>
+        <item>@drawable/ic_category12</item>
+        <item>@drawable/ic_category13</item>
+        <item>@drawable/ic_category14</item>
+        <item>@drawable/ic_category15</item>
+        <item>@drawable/ic_category16</item>
+        <item>@drawable/ic_category17</item>
+        <item>@drawable/ic_category18</item>
+        <item>@drawable/ic_category19</item>
+        <item>@drawable/ic_category20</item>
+        <item>@drawable/ic_category21</item>
+        <item>@drawable/ic_category22</item>
+        <item>@drawable/ic_category23</item>
+        <item>@drawable/ic_category24</item>
+        <item>@drawable/ic_category25</item>
+        <item>@drawable/ic_category26</item>
+        <item>@drawable/ic_category27</item>
+        <item>@drawable/ic_category28</item>
+        <item>@drawable/ic_category29</item>
+        <item>@drawable/ic_category30</item>
+        <item>@drawable/ic_category31</item>
+        <item>@drawable/ic_category32</item>
+        <item>@drawable/ic_category33</item>
+        <item>@drawable/ic_category34</item>
+        <item>@drawable/ic_category35</item>
+        <item>@drawable/ic_category36</item>
+    </integer-array>
+</resources>

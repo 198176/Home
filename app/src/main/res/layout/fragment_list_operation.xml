@@ -1,0 +1,54 @@
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/card_view_operation"
+    android:layout_margin="5dp">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatingCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:layout_margin="@dimen/fab_margin"
+            app:fabSize="mini"/>
+        <TextView
+            android:id="@+id/title_operation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_alignTop="@+id/floatingCategory"
+            android:layout_toRightOf="@+id/floatingCategory"
+            android:textSize="18sp"
+            android:textColor="#000000" />
+        <TextView
+            android:id="@+id/category_operation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_alignBottom="@+id/floatingCategory"
+            android:layout_toRightOf="@+id/floatingCategory"
+            android:textColor="@color/cardview_dark_background" />
+        <TextView
+            android:id="@+id/value_operation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/fab_margin"
+            android:layout_alignTop="@+id/floatingCategory"
+            android:layout_alignParentRight="true"
+            android:textSize="18sp"
+            android:textColor="#000000" />
+        <TextView
+            android:id="@+id/date_operation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/fab_margin"
+            android:layout_alignBottom="@+id/floatingCategory"
+            android:layout_alignParentRight="true"
+            android:textColor="@color/cardview_dark_background" />
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
