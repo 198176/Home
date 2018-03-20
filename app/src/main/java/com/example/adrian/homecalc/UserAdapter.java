@@ -1,14 +1,19 @@
 package com.example.adrian.homecalc;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 /**
@@ -17,24 +22,15 @@ import android.widget.TextView;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
-    interface UserListener {
-        void setValue(String text, int ids);
-    }
-
     private UserListener listener;
-
+    private Context context;
+    private SparseArray<String> sparseArray;
     private Cursor cursor;
 
-    public UserAdapter(Cursor cursor){
+    public UserAdapter(Context context, Cursor cursor, SparseArray<String> sparseArray) {
+        this.context = context;
         this.cursor = cursor;
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        private CardView cardView;
-        public ViewHolder(CardView v) {
-            super(v);
-            cardView = v;
-        }
+        this.sparseArray = sparseArray;
     }
 
     @Override
@@ -45,7 +41,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder,final int position) {
+    public void onBindViewHolder(ViewHolder holder, final int position) {
         CardView cardView = holder.cardView;
         cursor.moveToPosition(position);
         FloatingActionButton floating = (FloatingActionButton) cardView.findViewById(R.id.floatingButton);
@@ -55,28 +51,29 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         TextView categoryTitle = (TextView) cardView.findViewById(R.id.category_title);
         categoryTitle.setText(cursor.getString(0));
         final TextView value = (TextView) cardView.findViewById(R.id.category_value);
-        cardView.setOnClickListener(new View.OnClickListener() {
+        if (sparseArray.size() != 0) {
+            value.setText(sparseArray.get(cursor.getInt(3)));
+        }
+        ImageButton imageButton = (ImageButton) cardView.findViewById(R.id.rest_cost);
+        imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(listener != null){
+                if (listener != null) {
                     cursor.moveToPosition(position);
-                    listener.setValue(cursor.getString(0), cursor.getInt(3));
+                    listener.setBalance(position, cursor.getInt(3));
                 }
             }
         });
-//        if(!cursor.isNull(4)){
-//            TextView value = (TextView) cardView.findViewById(R.id.category_value);
-//            String mark = "";
-//            double val = cursor.getDouble(4);
-//            if(val<0){
-//                value.setTextColor(0xFFD50000);
-//            }
-//            else{
-//                value.setTextColor(0xFF2E7D32);
-//                mark = "+";
-//            }
-//            value.setText(mark+String.format("%.2f zł", val));
-//        }
+        cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showNumbers();
+                if (listener != null) {
+                    cursor.moveToPosition(position);
+                    listener.setValue(position, cursor.getInt(3));
+                }
+            }
+        });
     }
 
     @Override
@@ -86,5 +83,26 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     public void setListener(UserListener listener) {
         this.listener = listener;
+    }
+
+    public void showNumbers() {
+        FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
+        NumbersFragment fragment = new NumbersFragment();
+        fragment.show(manager, "Dialog");
+    }
+
+    interface UserListener {
+        void setValue(int position, int id);
+
+        void setBalance(int position, int id);
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private CardView cardView;
+
+        public ViewHolder(CardView v) {
+            super(v);
+            cardView = v;
+        }
     }
 }
