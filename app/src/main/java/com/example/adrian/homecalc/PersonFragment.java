@@ -1,6 +1,5 @@
 package com.example.adrian.homecalc;
 
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -13,27 +12,24 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by Adrian on 2018-03-20.
  */
-public class CategoryFragment extends DialogFragment {
 
-    interface CategoryListener{
-        void setCategory(String text, int ids);
+public class PersonFragment extends DialogFragment {
+
+    interface PersonListener{
+        void setPerson(int ids, int icon, int color);
     }
 
-    private CategoryListener listener;
+    private PersonFragment.PersonListener listener;
 
     private RecyclerView view;
     private ListView list;
@@ -48,7 +44,7 @@ public class CategoryFragment extends DialogFragment {
         try{
             SQLiteOpenHelper helper = new ApplicationDatabase(getActivity());
             db = helper.getReadableDatabase();
-            cursor = db.query("CATEGORY", new String[]{"NAME", "COLOR", "ICON_ID", "_id"}, null, null, null, null, null);
+            cursor = db.query("PERSON", new String[]{"NAME", "COLOR", "ICON_ID", "_id"}, null, null, null, null, null);
         } catch(SQLiteException w){
             Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
             toast.show();
@@ -60,7 +56,7 @@ public class CategoryFragment extends DialogFragment {
         adapter.setListener(new CategoryAdapter.CategoryListener() {
             @Override
             public void setCategory(String text, int ids, int icon, int color) {
-                listener.setCategory(text, ids);
+                listener.setPerson(ids, icon, color);
                 dismiss();
             }
         });
@@ -71,14 +67,7 @@ public class CategoryFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(view);
-        builder.setTitle("Kategorie");
-        builder.setNeutralButton("Dodaj kategorię", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(getActivity(), NewCategoryActivity.class);
-                startActivity(intent);
-            }
-        });
+        builder.setTitle("Osoby");
         return builder.create();
     }
 
@@ -92,6 +81,7 @@ public class CategoryFragment extends DialogFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        this.listener = (CategoryListener) activity;
+        this.listener = (PersonFragment.PersonListener) activity;
     }
+
 }

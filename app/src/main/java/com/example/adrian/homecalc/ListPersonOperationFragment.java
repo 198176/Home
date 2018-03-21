@@ -1,6 +1,5 @@
 package com.example.adrian.homecalc;
 
-
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -13,19 +12,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Spinner;
 import android.widget.Toast;
 
-
 /**
- * A simple {@link Fragment} subclass.
+ * Created by Adrian on 2018-03-20.
  */
-public class ListOperationFragment extends Fragment {
 
-
-    public ListOperationFragment() {
-        // Required empty public constructor
-    }
+public class ListPersonOperationFragment extends Fragment {
 
     private SQLiteDatabase db;
     private Cursor cursor;
@@ -39,9 +32,6 @@ public class ListOperationFragment extends Fragment {
         try{
             helper = new ApplicationDatabase(getActivity());
             db = helper.getReadableDatabase();
-//            cursor = db.rawQuery("SELECT PAYMENT.TITLE, PAYMENT.VALUE, PAYMENT.DATE, "+
-//                            "CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID FROM PAYMENT, CATEGORY "+
-//                            "WHERE PAYMENT.CATEGORY_ID=CATEGORY._id",null);
         } catch(SQLiteException w){
             Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
             toast.show();
@@ -52,8 +42,6 @@ public class ListOperationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = (RecyclerView) inflater.inflate(R.layout.dialog_category, container, false);
-//        adapter = new ListOperationAdapter(cursor);
-//        view.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         view.setLayoutManager(layoutManager);
         return view;
@@ -62,19 +50,19 @@ public class ListOperationFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-            try {
-                cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), PAYMENT.DATE, " +
-                        "CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID FROM PAYMENT, CATEGORY " +
-                        "WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND SUBSTR(PAYMENT.DATE, 1, 7)='" +
-                        MainActivity.getSpinnerDate() + "' GROUP BY PAYMENT.ID_PAY " +
-                        "ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
-            } catch (SQLiteException w) {
-                Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-                toast.show();
-            }
+        try {
+            cursor = db.rawQuery("SELECT PAYMENT.TITLE, PAYMENT.VALUE, PAYMENT.DATE, " +
+                    "CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID FROM PAYMENT, CATEGORY " +
+                    "WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND SUBSTR(PAYMENT.DATE, 1, 7)='" +
+                    MainActivity.getSpinnerDate() + "' AND PAYMENT.PERSON_ID='" +
+                    MainActivity.getPersonId() + "' ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
+        } catch (SQLiteException w) {
+            Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
+            toast.show();
+        }
 
-            adapter = new ListOperationAdapter(cursor);
-            view.setAdapter(adapter);
+        adapter = new ListOperationAdapter(cursor);
+        view.setAdapter(adapter);
     }
 
     @Override

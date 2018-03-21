@@ -22,10 +22,19 @@
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/AppTheme.PopupOverlay">
+
             <Spinner
                 android:id="@+id/spinner"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"></Spinner>
+                android:layout_height="wrap_content" />
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabSize="mini"
+                app:elevation="12dp"
+                app:borderWidth="3dp"/>
 
         </android.support.v7.widget.Toolbar>
 

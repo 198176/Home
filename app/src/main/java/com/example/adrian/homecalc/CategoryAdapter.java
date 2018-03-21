@@ -15,7 +15,7 @@ import android.widget.TextView;
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHolder> {
 
     interface CategoryListener{
-        void setCategory(String text, int ids);
+        void setCategory(String text, int ids, int icon, int color);
     }
 
     private CategoryListener listener;
@@ -56,7 +56,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             public void onClick(View v) {
                 if(listener != null){
                     cursor.moveToPosition(position);
-                    listener.setCategory(cursor.getString(0), cursor.getInt(3));
+                    listener.setCategory(cursor.getString(0), cursor.getInt(3),
+                            cursor.getInt(2), cursor.getInt(1));
                 }
             }
         });

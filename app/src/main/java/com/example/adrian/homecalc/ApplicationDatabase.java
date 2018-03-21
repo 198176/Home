@@ -39,11 +39,12 @@ public class ApplicationDatabase extends SQLiteOpenHelper {
         values = new ContentValues();
         values.put(NAME, "Kasia");
         values.put(COLOR, 0xFFE91E63);
-        values.put(ICON_ID, R.drawable.ic_category1);
+        values.put(ICON_ID, R.drawable.ic_category13);
         db.insert("PERSON", null, values);
 
-        db.execSQL("CREATE TABLE PAYMENT (_id INTEGER PRIMARY KEY AUTOINCREMENT, "+"TITLE TEXT, "+"VALUE REAL, "
-                +"DATE TEXT, "+"CATEGORY_ID INTEGER, "+"FOREIGN KEY (CATEGORY_ID) REFERENCES CATEGORY (_id));");
+        db.execSQL("CREATE TABLE PAYMENT (_id INTEGER PRIMARY KEY AUTOINCREMENT, "+"ID_PAY INTEGER,"
+                +"TITLE TEXT, "+"VALUE REAL, "+"DATE TEXT, "+"CATEGORY_ID INTEGER, "+"PERSON_ID INTEGER, "
+                +"FOREIGN KEY (CATEGORY_ID) REFERENCES CATEGORY (_id));");
 //        ContentValues values = new ContentValues();
 //        values.put("TITLE", "Tytuł");
 //        values.put("VALUE", 22.34);

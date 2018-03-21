@@ -127,7 +127,8 @@ public class ListSummaryFragment extends Fragment {
         try{
             cursor = db.rawQuery("SELECT CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, CATEGORY._id, SUM(PAYMENT.VALUE) "+
                     "FROM PAYMENT, CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND SUBSTR(PAYMENT.DATE, 1, 7)='" +
-                    MainActivity.spinner_date + "' GROUP BY CATEGORY._id",null);
+                    MainActivity.getSpinnerDate() + "' AND PAYMENT.PERSON_ID='" +
+                    MainActivity.getPersonId() + "' GROUP BY CATEGORY._id",null);
         } catch(SQLiteException w){
             Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
             toast.show();

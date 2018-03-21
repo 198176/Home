@@ -264,6 +264,7 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
     private void createOperations() {
         ContentValues values = new ContentValues();
         String title = titleText.getText().toString();
+        int id = getId() + 1;
         if (title.length() == 0) {
             title = titleText.getHint().toString();
         }
@@ -273,10 +274,13 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
             if (number == 0.0) {
                 continue;
             }
+            else {
+                number *= -1;
+            }
             try {
-                values.put("ID_PAY", getId() + 1);
+                values.put("ID_PAY", id);
                 values.put("TITLE", title);
-                values.put("VALUE", number * (-1));
+                values.put("VALUE", number);
                 values.put("DATE", dateText.getText().toString());
                 values.put("CATEGORY_ID", ids);
                 values.put("PERSON_ID", key);
