@@ -19,11 +19,9 @@ import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 
@@ -34,11 +32,14 @@ import java.util.ArrayList;
 public class ListSummaryFragment extends Fragment {
 
 
-    public ListSummaryFragment() {
-        // Required empty public constructor
-    }
-
-
+    BarChart chart;
+    //ArrayList<BarEntry> BARENTRY ;
+    //ArrayList<String> BarEntryLabels ;
+    BarDataSet Bardataset;
+    BarData BARDATA;
+    PieChart pieChart;
+    PieDataSet pieDataSet;
+    PieData pieData;
     private SQLiteDatabase db;
     private Cursor cursor;
     private View view;
@@ -46,23 +47,17 @@ public class ListSummaryFragment extends Fragment {
     private SQLiteOpenHelper helper;
     private SummaryAdapter adapter;
 
-    BarChart chart ;
-    //ArrayList<BarEntry> BARENTRY ;
-    //ArrayList<String> BarEntryLabels ;
-    BarDataSet Bardataset ;
-    BarData BARDATA ;
-
-    PieChart pieChart;
-    PieDataSet pieDataSet ;
-    PieData pieData ;
+    public ListSummaryFragment() {
+        // Required empty public constructor
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try{
+        try {
             helper = new ApplicationDatabase(getActivity());
             db = helper.getReadableDatabase();
-        } catch(SQLiteException w){
+        } catch (SQLiteException w) {
             Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
             toast.show();
         }
@@ -124,12 +119,12 @@ public class ListSummaryFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        try{
-            cursor = db.rawQuery("SELECT CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, CATEGORY._id, SUM(PAYMENT.VALUE) "+
+        try {
+            cursor = db.rawQuery("SELECT CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, CATEGORY._id, SUM(PAYMENT.VALUE) " +
                     "FROM PAYMENT, CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND SUBSTR(PAYMENT.DATE, 1, 7)='" +
                     MainActivity.getSpinnerDate() + "' AND PAYMENT.PERSON_ID='" +
-                    MainActivity.getPersonId() + "' GROUP BY CATEGORY._id",null);
-        } catch(SQLiteException w){
+                    MainActivity.getPersonId() + "' AND PAYMENT.VALUE<0 GROUP BY CATEGORY._id", null);
+        } catch (SQLiteException w) {
             Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
             toast.show();
         }
@@ -137,7 +132,7 @@ public class ListSummaryFragment extends Fragment {
         rview.setAdapter(adapter);
         adapter.setListener(new SummaryAdapter.SummaryListener() {
             @Override
-            public void setSummary(ArrayList<Entry> entry, ArrayList<String> labels, ArrayList<Integer> colors) {
+            public void setSummary(ArrayList<Entry> entry, ArrayList<String> labels, ArrayList<Integer> colors, double sum) {
                 //Bardataset = new BarDataSet(entry, "Projects");
                 pieDataSet = new PieDataSet(entry, "");
                 //BARDATA = new BarData(labels, Bardataset);
@@ -150,13 +145,13 @@ public class ListSummaryFragment extends Fragment {
                 pieChart.animateY(3000);
                 pieDataSet.setValueTextColor(0xFFFFFFFF);
                 pieDataSet.setValueTextSize(10f);
-                pieChart.setCenterText("1000 zł");
+                pieChart.setCenterText(OperationActivity.replaceDoubleToString(sum));
             }
         });
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         cursor.close();
         db.close();

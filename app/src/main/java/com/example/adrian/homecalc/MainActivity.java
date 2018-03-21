@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
     private Animation fabOpen, fabClose, fabRClockwise, fabRAnticlockwise;
     private TextView textPlus, textMinus;
     private SQLiteDatabase db;
+    private Spinner spinner;
 
     public static String getSpinnerDate() {
         return spinner_date;
@@ -98,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
         textPlus = (TextView) findViewById(R.id.plus_text);
         textMinus = (TextView) findViewById(R.id.minus_text);
 
+        spinner = (Spinner) findViewById(R.id.spinner);
         person = (FloatingActionButton) findViewById(R.id.fab_person);
         try {
             Cursor cursor = db.rawQuery("SELECT COLOR, ICON_ID, _id FROM PERSON", null);
@@ -128,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
                 clickFab();
                 Intent intent = new Intent(MainActivity.this, OperationActivity.class);
                 intent.putExtra(OperationActivity.INT_EXTRA, 0);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
             }
         });
 
@@ -139,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
                 clickFab();
                 Intent intent = new Intent(MainActivity.this, OperationActivity.class);
                 intent.putExtra(OperationActivity.INT_EXTRA, 1);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
             }
         });
 
@@ -155,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
     }
 
     public void setSpinnerDate() {
-        final Spinner spinner = (Spinner) findViewById(R.id.spinner);
         try {
             Cursor cur = db.rawQuery("SELECT _id, SUBSTR(DATE, 1, 7) MONTH FROM PAYMENT GROUP BY MONTH ORDER BY MONTH DESC", null);
             CursorAdapter listAdapter = new SimpleCursorAdapter(this, R.layout.spinner_date,
@@ -169,6 +170,7 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
                     spinner_date = c.getString(c.getColumnIndex("MONTH"));
                     refreshFragments();
                 }
+
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
 
@@ -195,9 +197,9 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
         fragment.show(manager, "Person");
     }
 
-    private void refreshFragments(){
+    private void refreshFragments() {
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
-        if(fragmentList!=null) {
+        if (fragmentList != null) {
             for (int i = 0; i < fragmentList.size(); i++) {
                 Fragment fragment = fragmentList.get(i);
                 if (fragment != null && !fragment.getClass().equals(PersonFragment.class)) {
@@ -249,6 +251,12 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        setSpinnerDate();
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {

@@ -291,7 +291,8 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
             }
         }
         finish();
-        startActivity(getSupportParentActivityIntent());
+        setResult(RESULT_OK, getSupportParentActivityIntent());
+        //startActivity(getSupportParentActivityIntent());
     }
 
     public double replaceStringToDouble(String text) {
@@ -299,7 +300,7 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
                 ",", ".").substring(0, text.length() - 3));
     }
 
-    public String replaceDoubleToString(double value) {
+    public static String replaceDoubleToString(double value) {
         String text = String.format("%.2f", value);
         return (text.replace(".", ",") + " zł");
     }
