@@ -8,14 +8,19 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -24,13 +29,17 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements PersonFragment.PersonListener {
+public class MainActivity extends AppCompatActivity implements PersonDialogFragment.PersonListener,
+        NavigationView.OnNavigationItemSelectedListener{
 
     private static String spinner_date = "";
     private static int person_id = 1;
@@ -48,11 +57,13 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private FloatingActionButton fab, fab_plus, fab_minus, person;
+    private ImageView person;
+    private FloatingActionButton fab, fab_plus, fab_minus;
     private Animation fabOpen, fabClose, fabRClockwise, fabRAnticlockwise;
     private TextView textPlus, textMinus;
     private SQLiteDatabase db;
     private Spinner spinner;
+    private DrawerLayout drawer;
 
     public static String getSpinnerDate() {
         return spinner_date;
@@ -71,10 +82,20 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.layout_drawer_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -100,11 +121,11 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
         textMinus = (TextView) findViewById(R.id.minus_text);
 
         spinner = (Spinner) findViewById(R.id.spinner);
-        person = (FloatingActionButton) findViewById(R.id.fab_person);
+        person = (ImageView) findViewById(R.id.fab_person);
         try {
-            Cursor cursor = db.rawQuery("SELECT COLOR, ICON_ID, _id FROM PERSON", null);
+            Cursor cursor = db.rawQuery("SELECT NAME, COLOR, _id FROM PERSON", null);
             cursor.moveToFirst();
-            setPerson(cursor.getInt(2), cursor.getInt(1), cursor.getInt(0));
+            setPerson(cursor.getString(0), cursor.getInt(1), cursor.getInt(2));
         } catch (SQLiteException w) {
             Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
             toast.show();
@@ -183,17 +204,18 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
     }
 
     @Override
-    public void setPerson(int ids, int icon, int color) {
-        Drawable drawable = getResources().getDrawable(icon);
-        person.setBackgroundTintList(ColorStateList.valueOf(color));
-        person.setImageDrawable(drawable);
+    public void setPerson(String text, int color, int ids) {
+        TextDrawable textDrawable = TextDrawable.builder()
+                .buildRound(Character.toString(text.charAt(0)), color);
+        ImageView image = (ImageView) findViewById(R.id.fab_person);
+        image.setImageDrawable(textDrawable);
         person_id = ids;
         refreshFragments();
     }
 
     private void showPerson() {
         FragmentManager manager = getSupportFragmentManager();
-        PersonFragment fragment = new PersonFragment();
+        PersonDialogFragment fragment = new PersonDialogFragment();
         fragment.show(manager, "Person");
     }
 
@@ -202,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
         if (fragmentList != null) {
             for (int i = 0; i < fragmentList.size(); i++) {
                 Fragment fragment = fragmentList.get(i);
-                if (fragment != null && !fragment.getClass().equals(PersonFragment.class)) {
+                if (fragment != null && !fragment.getClass().equals(PersonDialogFragment.class)) {
                     getSupportFragmentManager().beginTransaction().detach(fragment).attach(fragment).commit();
                 }
             }
@@ -257,6 +279,31 @@ public class MainActivity extends AppCompatActivity implements PersonFragment.Pe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         setSpinnerDate();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        String title = item.getTitle().toString();
+        Intent intent = new Intent(this, DrawerActivity.class);
+        intent.putExtra("id", id);
+        intent.putExtra("title", title);
+        startActivity(intent);
+//        switch (id) {
+//            case R.id.nav_home:
+//                break;
+//            case R.id.nav_users:
+//                showPerson();
+//                break;
+//            case R.id.nav_category:
+//
+//                break;
+//            case R.id.nav_arrears:
+//                break;
+//            default:
+//        }
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {

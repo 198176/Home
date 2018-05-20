@@ -18,4 +18,7 @@
     <string name="select_icon">Wybierz ikonę</string>
     <string name="cancel">Anuluj</string>
     <string name="ok">OK</string>
+    <string name="navigation_drawer_open">Otwórz szufladę</string>
+    <string name="navigation_drawer_close">Zamknij szufladę</string>
+    <string name="title_activity_new_user">Nowy użytkownik</string>
 </resources>

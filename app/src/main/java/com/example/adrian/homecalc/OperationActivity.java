@@ -24,7 +24,8 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class OperationActivity extends AppCompatActivity implements NumbersFragment.ValueListener, CategoryFragment.CategoryListener {
+public class OperationActivity extends AppCompatActivity implements NumbersFragment.ValueListener,
+        CategoryDialogFragment.CategoryListener {
 
     public static final String INT_EXTRA = "extra";
     private static final String DIALOG = "Dialog";
@@ -70,10 +71,10 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
             participant.setLayoutManager(layoutManager);
             balance = (TextView) findViewById(R.id.balance);
             try {
-                Cursor cur = db.rawQuery("SELECT NAME, COLOR, ICON_ID, _id FROM PERSON", null);
+                Cursor cur = db.rawQuery("SELECT NAME, COLOR, _id FROM PERSON", null);
                 adapter = new UserAdapter(this, cur, sparseArray);
                 participant.setAdapter(adapter);
-                adapter.setListener(new UserAdapter.UserListener() {
+                adapter.setUserListener(new UserAdapter.UserListener() {
                     @Override
                     public void setValue(int position, int id) {
                         place = position;
@@ -232,7 +233,7 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
 
     private void showCategory() {
         FragmentManager manager = getSupportFragmentManager();
-        CategoryFragment fragment = new CategoryFragment();
+        CategoryDialogFragment fragment = new CategoryDialogFragment();
         fragment.show(manager, "Category");
     }
 

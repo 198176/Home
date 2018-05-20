@@ -1,36 +1,41 @@
 package com.example.adrian.homecalc;
 
-
+import android.app.Activity;
+import android.app.Dialog;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 /**
- * A simple {@link Fragment} subclass.
+ * Created by Adrian on 2018-03-20.
  */
-public class PersonFragment extends Fragment {
 
+public class PersonDialogFragment extends DialogFragment {
 
-    public PersonFragment() {
-        // Required empty public constructor
+    interface PersonListener{
+        void setPerson(String text, int color, int ids);
     }
+
+    private PersonDialogFragment.PersonListener listener;
 
     private RecyclerView view;
     private SQLiteDatabase db;
     private Cursor cursor;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        LayoutInflater inflater = getActivity().getLayoutInflater();
         view = (RecyclerView) inflater.inflate(R.layout.dialog_category, null);
         try{
             SQLiteOpenHelper helper = new ApplicationDatabase(getActivity());
@@ -44,7 +49,22 @@ public class PersonFragment extends Fragment {
         view.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         view.setLayoutManager(layoutManager);
-        return view;
+        adapter.setPersonListener(new UserAdapter.PersonListener() {
+            @Override
+            public void setPerson(String text, int color, int ids) {
+                listener.setPerson(text, color, ids);
+                dismiss();
+            }
+        });
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setView(view);
+        builder.setTitle("Osoby");
+        return builder.create();
     }
 
     @Override
@@ -52,6 +72,12 @@ public class PersonFragment extends Fragment {
         super.onDestroy();
         cursor.close();
         db.close();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.listener = (PersonDialogFragment.PersonListener) activity;
     }
 
 }

@@ -1,10 +1,7 @@
 package com.example.adrian.homecalc;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -14,7 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.amulyakhare.textdrawable.TextDrawable;
 
 /**
  * Created by Adrian on 2018-03-14.
@@ -22,10 +22,15 @@ import android.widget.TextView;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
-    private UserListener listener;
+    private UserListener userListener;
+    private PersonListener personListener;
     private Context context;
     private SparseArray<String> sparseArray;
     private Cursor cursor;
+
+    public UserAdapter(Cursor cursor) {
+        this.cursor = cursor;
+    }
 
     public UserAdapter(Context context, Cursor cursor, SparseArray<String> sparseArray) {
         this.context = context;
@@ -44,36 +49,50 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, final int position) {
         CardView cardView = holder.cardView;
         cursor.moveToPosition(position);
-        FloatingActionButton floating = (FloatingActionButton) cardView.findViewById(R.id.floatingButton);
-        Drawable drawable = cardView.getResources().getDrawable(cursor.getInt(2));
-        floating.setBackgroundTintList(ColorStateList.valueOf(cursor.getInt(1)));
-        floating.setImageDrawable(drawable);
         TextView categoryTitle = (TextView) cardView.findViewById(R.id.category_title);
         categoryTitle.setText(cursor.getString(0));
-        final TextView value = (TextView) cardView.findViewById(R.id.category_value);
-        if (sparseArray.size() != 0) {
-            value.setText(sparseArray.get(cursor.getInt(3)));
-        }
+        TextDrawable textDrawable = TextDrawable.builder()
+                .buildRound(Character.toString(cursor.getString(0).charAt(0)), cursor.getInt(1));
+        ImageView image = (ImageView) cardView.findViewById(R.id.image_user);
+        image.setImageDrawable(textDrawable);
         ImageButton imageButton = (ImageButton) cardView.findViewById(R.id.rest_cost);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (listener != null) {
-                    cursor.moveToPosition(position);
-                    listener.setBalance(position, cursor.getInt(3));
-                }
+        if(sparseArray != null) {
+            final TextView value = (TextView) cardView.findViewById(R.id.category_value);
+            if (sparseArray.size() != 0) {
+                value.setText(sparseArray.get(cursor.getInt(2)));
             }
-        });
-        cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showNumbers();
-                if (listener != null) {
-                    cursor.moveToPosition(position);
-                    listener.setValue(position, cursor.getInt(3));
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (userListener != null) {
+                        cursor.moveToPosition(position);
+                        userListener.setBalance(position, cursor.getInt(2));
+                    }
                 }
-            }
-        });
+            });
+            cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showNumbers();
+                    if (userListener != null) {
+                        cursor.moveToPosition(position);
+                        userListener.setValue(position, cursor.getInt(2));
+                    }
+                }
+            });
+        }
+        else {
+            imageButton.setVisibility(View.INVISIBLE);
+            cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (personListener != null) {
+                        cursor.moveToPosition(position);
+                        personListener.setPerson(cursor.getString(0), cursor.getInt(1), cursor.getInt(2));
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -81,8 +100,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         return cursor.getCount();
     }
 
-    public void setListener(UserListener listener) {
-        this.listener = listener;
+    public void setUserListener(UserListener userListener) {
+        this.userListener = userListener;
+    }
+
+    public void setPersonListener(PersonListener personListener) {
+        this.personListener = personListener;
     }
 
     public void showNumbers() {
@@ -95,6 +118,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         void setValue(int position, int id);
 
         void setBalance(int position, int id);
+    }
+
+    interface PersonListener {
+        void setPerson(String text, int color, int id);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
