@@ -1,6 +1,7 @@
 package com.example.adrian.homecalc;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -44,7 +45,21 @@ public class CategoryFragment extends Fragment {
         view.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         view.setLayoutManager(layoutManager);
+        adapter.setListener(new CategoryAdapter.CategoryListener() {
+            @Override
+            public void setCategory(String text, int ids, int icon, int color) {
+                Intent intent = new Intent(getActivity(), NewCategoryActivity.class);
+                intent.putExtra(NewCategoryActivity.EDIT, ids);
+                startActivityForResult(intent, 0);
+            }
+        });
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
     }
 
     @Override
