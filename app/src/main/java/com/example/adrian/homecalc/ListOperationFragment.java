@@ -1,6 +1,7 @@
 package com.example.adrian.homecalc;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -13,7 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 
@@ -23,26 +23,24 @@ import android.widget.Toast;
 public class ListOperationFragment extends Fragment {
 
 
+    private SQLiteDatabase db;
+    private Cursor cursor;
+    private RecyclerView view;
+    private ListOperationAdapter adapter;
     public ListOperationFragment() {
         // Required empty public constructor
     }
 
-    private SQLiteDatabase db;
-    private Cursor cursor;
-    private RecyclerView view;
-    private SQLiteOpenHelper helper;
-    private ListOperationAdapter adapter;
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try{
-            helper = new ApplicationDatabase(getActivity());
+        try {
+            SQLiteOpenHelper helper = new ApplicationDatabase(getActivity());
             db = helper.getReadableDatabase();
 //            cursor = db.rawQuery("SELECT PAYMENT.TITLE, PAYMENT.VALUE, PAYMENT.DATE, "+
 //                            "CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID FROM PAYMENT, CATEGORY "+
 //                            "WHERE PAYMENT.CATEGORY_ID=CATEGORY._id",null);
-        } catch(SQLiteException w){
+        } catch (SQLiteException w) {
             Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
             toast.show();
         }
@@ -62,23 +60,32 @@ public class ListOperationFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-            try {
-                cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), PAYMENT.DATE, " +
-                        "CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID FROM PAYMENT, CATEGORY " +
-                        "WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND SUBSTR(PAYMENT.DATE, 1, 7)='" +
-                        MainActivity.getSpinnerDate() + "' GROUP BY PAYMENT.ID_PAY " +
-                        "ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
-            } catch (SQLiteException w) {
-                Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-                toast.show();
-            }
+        try {
+            cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), PAYMENT.DATE, " +
+                    "CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, PAYMENT.ID_PAY FROM PAYMENT, CATEGORY " +
+                    "WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND SUBSTR(PAYMENT.DATE, 1, 7)='" +
+                    MainActivity.getSpinnerDate() + "' GROUP BY PAYMENT.ID_PAY " +
+                    "ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
+        } catch (SQLiteException w) {
+            Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
+            toast.show();
+        }
 
-            adapter = new ListOperationAdapter(cursor);
-            view.setAdapter(adapter);
+        adapter = new ListOperationAdapter(cursor);
+        adapter.setOperationListener(new ListOperationAdapter.OperationListener() {
+            @Override
+            public void editOperation(int id) {
+                Intent intent = new Intent(getActivity(), OperationActivity.class);
+                intent.putExtra(OperationActivity.INT_EXTRA, 0);
+                intent.putExtra(OperationActivity.EDIT, id);
+                startActivityForResult(intent, 0);
+            }
+        });
+        view.setAdapter(adapter);
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         cursor.close();
         db.close();

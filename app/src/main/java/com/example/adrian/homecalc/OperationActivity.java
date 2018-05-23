@@ -2,6 +2,7 @@ package com.example.adrian.homecalc;
 
 import android.app.DatePickerDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,10 +10,13 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -28,6 +32,7 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
         CategoryDialogFragment.CategoryListener {
 
     public static final String INT_EXTRA = "extra";
+    public static final String EDIT = "edit";
     private static final String DIALOG = "Dialog";
 
     private SimpleDateFormat dateFormat;
@@ -46,14 +51,19 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
     private int day, month, year;
     private SQLiteDatabase db;
     private RadioGroup radioGroup;
-    private int ids, impact;
+    private int ids, impact, idPlace;
     private double value;
     private UserAdapter adapter;
     private int place = -1;
-    private int idPlace;
+    private int idEdit = -1;
     private TextView balance;
     private boolean plus;
     private SparseArray<String> sparseArray = new SparseArray<>();
+
+    public static String replaceDoubleToString(double value) {
+        String text = String.format("%.2f", value);
+        return (text.replace(".", ",") + " zł");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,47 +71,14 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
 //        setContentView(R.layout.activity_operation);
         Intent intent = getIntent();
         impact = intent.getIntExtra(INT_EXTRA, 0);
+        idEdit = intent.getIntExtra(EDIT, -1);
         SQLiteOpenHelper helper = new ApplicationDatabase(this);
         db = helper.getWritableDatabase();
 
         if (impact == 0) {
             setContentView(R.layout.activity_expense);
-            RecyclerView participant = (RecyclerView) findViewById(R.id.participant);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-            participant.setLayoutManager(layoutManager);
-            balance = (TextView) findViewById(R.id.balance);
-            try {
-                Cursor cur = db.rawQuery("SELECT NAME, COLOR, _id FROM PERSON", null);
-                adapter = new UserAdapter(this, cur, sparseArray);
-                participant.setAdapter(adapter);
-                adapter.setUserListener(new UserAdapter.UserListener() {
-                    @Override
-                    public void setValue(int position, int id) {
-                        place = position;
-                        idPlace = id;
-                    }
-
-                    @Override
-                    public void setBalance(int position, int id) {
-                        double value = 0.0;
-                        if (sparseArray.get(id) != null) {
-                            value = replaceStringToDouble(sparseArray.get(id));
-                        }
-                        double balanceValue = replaceStringToDouble(balance.getText().toString());
-                        value += balanceValue;
-                        balanceValue = 0.0;
-                        sparseArray.put(id, replaceDoubleToString(value));
-                        balance.setText(replaceDoubleToString(balanceValue));
-                        adapter.notifyItemChanged(position);
-                    }
-                });
-            } catch (SQLiteException w) {
-                Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-                toast.show();
-            }
         } else {
             setContentView(R.layout.activity_operation);
-            radioGroup = (RadioGroup) findViewById(R.id.radio_group);
         }
 
         valueText = (EditText) findViewById(R.id.value);
@@ -189,6 +166,47 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
                 }
             }
         });
+
+        if (impact == 0) {
+            RecyclerView participant = (RecyclerView) findViewById(R.id.participant);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            participant.setLayoutManager(layoutManager);
+            balance = (TextView) findViewById(R.id.balance);
+            if (idEdit != -1) {
+                editFields();
+            }
+            try {
+                Cursor cur = db.rawQuery("SELECT NAME, COLOR, _id FROM PERSON", null);
+                adapter = new UserAdapter(this, cur, sparseArray);
+                participant.setAdapter(adapter);
+                adapter.setUserListener(new UserAdapter.UserListener() {
+                    @Override
+                    public void setValue(int position, int id) {
+                        place = position;
+                        idPlace = id;
+                    }
+
+                    @Override
+                    public void setBalance(int position, int id) {
+                        double value = 0.0;
+                        if (sparseArray.get(id) != null) {
+                            value = replaceStringToDouble(sparseArray.get(id));
+                        }
+                        double balanceValue = replaceStringToDouble(balance.getText().toString());
+                        value += balanceValue;
+                        balanceValue = 0.0;
+                        sparseArray.put(id, replaceDoubleToString(value));
+                        balance.setText(replaceDoubleToString(balanceValue));
+                        adapter.notifyItemChanged(position);
+                    }
+                });
+            } catch (SQLiteException w) {
+                Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        } else {
+            radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+        }
     }
 
     private void updateDate() {
@@ -269,13 +287,16 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
         if (title.length() == 0) {
             title = titleText.getHint().toString();
         }
+        if (idEdit != -1) {
+            db.delete("PAYMENT", "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
+            id = idEdit;
+        }
         for (int i = 0; i < sparseArray.size(); i++) {
             int key = sparseArray.keyAt(i);
             double number = replaceStringToDouble(sparseArray.get(key));
             if (number == 0.0) {
                 continue;
-            }
-            else {
+            } else {
                 number *= -1;
             }
             try {
@@ -286,6 +307,7 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
                 values.put("CATEGORY_ID", ids);
                 values.put("PERSON_ID", key);
                 db.insert("PAYMENT", null, values);
+
             } catch (SQLiteException w) {
                 Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
                 toast.show();
@@ -301,11 +323,6 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
                 ",", ".").substring(0, text.length() - 3));
     }
 
-    public static String replaceDoubleToString(double value) {
-        String text = String.format("%.2f", value);
-        return (text.replace(".", ",") + " zł");
-    }
-
     private int getId() {
         Cursor cursor = db.rawQuery("SELECT _id FROM PAYMENT WHERE _id = ( SELECT MAX(_id) FROM PAYMENT)", null);
         cursor.moveToFirst();
@@ -314,5 +331,57 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
         } else {
             return 0;
         }
+    }
+
+    private void editFields() {
+        setTitle("Edycja operacji");
+        Cursor cursor = db.rawQuery("SELECT P.TITLE, P.VALUE, P.DATE, P.CATEGORY_ID, " +
+                "P.PERSON_ID, C.NAME FROM PAYMENT AS P, CATEGORY AS C WHERE P.CATEGORY_ID = C._id " +
+                "AND P.ID_PAY = " + idEdit, null);
+        cursor.moveToFirst();
+        titleText.setText(cursor.getString(0));
+        categoryText.setText(cursor.getString(5));
+        ids = cursor.getInt(3);
+        dateText.setText(cursor.getString(2));
+        double cursorValue = 0;
+        do {
+            cursorValue += (-1 * cursor.getDouble(1));
+            sparseArray.put(cursor.getInt(4), replaceDoubleToString(-1 * cursor.getDouble(1)));
+        } while (cursor.moveToNext());
+        valueText.setText(replaceDoubleToString(cursorValue));
+        cursor.close();
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (idEdit != -1) {
+            getMenuInflater().inflate(R.menu.menu_delete, menu);
+            MenuItem menuItem = menu.findItem(R.id.action_delete);
+            menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(OperationActivity.this);
+                    builder.setTitle("Potwierdzenie")
+                            .setMessage("Czy na pewno chcesz usunąć operacje?")
+                            .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    deleteOperation();
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).show();
+                    return true;
+                }
+            });
+        }
+        return true;
+    }
+
+    private void deleteOperation() {
+        db.delete("PAYMENT", "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
+        finish();
+        setResult(RESULT_OK, getSupportParentActivityIntent());
     }
 }
