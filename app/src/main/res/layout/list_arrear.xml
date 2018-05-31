@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/card_view_arrear"
+    android:layout_margin="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/image_user_from"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_margin="@dimen/fab_margin" />
+        <TextView
+            android:id="@+id/name_user_from"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_alignTop="@+id/image_user_from"
+            android:layout_toEndOf="@+id/image_user_from"
+            android:textSize="18sp"
+            android:textColor="#000000" />
+        <TextView
+            android:id="@+id/value_arrear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_alignBottom="@+id/image_user_from"
+            android:layout_toEndOf="@+id/image_user_from"
+            android:textColor="@color/fab2_color" />
+        <ImageView
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_arrow"/>
+        <ImageView
+            android:id="@+id/image_user_to"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="@dimen/fab_margin" />
+        <TextView
+            android:id="@+id/name_user_to"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_alignTop="@+id/image_user_to"
+            android:layout_toStartOf="@+id/image_user_to"
+            android:textSize="18sp"
+            android:textColor="#000000" />
+        <TextView
+            android:id="@+id/date_arrear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_alignBottom="@+id/image_user_to"
+            android:layout_toStartOf="@+id/image_user_to"
+            android:textColor="@color/cardview_dark_background" />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

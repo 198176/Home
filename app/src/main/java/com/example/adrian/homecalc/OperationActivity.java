@@ -318,7 +318,7 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
         //startActivity(getSupportParentActivityIntent());
     }
 
-    public double replaceStringToDouble(String text) {
+    public static double replaceStringToDouble(String text) {
         return Double.parseDouble(text.replace(
                 ",", ".").substring(0, text.length() - 3));
     }

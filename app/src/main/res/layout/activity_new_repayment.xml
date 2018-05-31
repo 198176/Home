@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/ambilwarna_hueWidth">
+
+    <ImageView
+        android:id="@+id/image_user_from"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:onClick="showPerson"/>
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_arrow"/>
+
+    <ImageView
+        android:id="@+id/image_user_to"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_alignParentEnd="true"
+        android:onClick="showPerson"/>
+
+    <TextView
+        android:id="@+id/text_user_from"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:layout_below="@id/image_user_from"
+        android:textSize="20sp"
+        android:textColor="#000000"
+        android:text="Kto?"/>
+
+    <TextView
+        android:id="@+id/text_user_to"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:layout_below="@id/image_user_to"
+        android:layout_alignEnd="@id/image_user_to"
+        android:textSize="20sp"
+        android:textColor="#000000"
+        android:text="Komu?"/>
+
+    <TextView
+        android:id="@+id/value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/image_user_to"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/ambilwarna_hueWidth"
+        android:textSize="18sp"
+        android:text="@string/value"/>
+
+    <EditText
+        android:id="@+id/value_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:hint="0.00 zł"
+        android:cursorVisible="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:layout_below="@id/value"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/operation_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/custom_button"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="OK"/>
+
+</RelativeLayout>

@@ -35,7 +35,14 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".NewUserActivity"
-            android:label="@string/title_activity_new_user"/>
+            android:label="@string/title_activity_new_user" />
+        <activity
+            android:name=".ExpenseActivity"
+            android:label="@string/title_activity_operation"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".NewRepaymentActivity"
+            android:label="Nowa spłata"/>
     </application>
 
 </manifest>

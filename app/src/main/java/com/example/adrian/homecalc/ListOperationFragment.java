@@ -26,7 +26,7 @@ public class ListOperationFragment extends Fragment {
     private SQLiteDatabase db;
     private Cursor cursor;
     private RecyclerView view;
-    private ListOperationAdapter adapter;
+
     public ListOperationFragment() {
         // Required empty public constructor
     }
@@ -41,8 +41,7 @@ public class ListOperationFragment extends Fragment {
 //                            "CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID FROM PAYMENT, CATEGORY "+
 //                            "WHERE PAYMENT.CATEGORY_ID=CATEGORY._id",null);
         } catch (SQLiteException w) {
-            Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -64,20 +63,18 @@ public class ListOperationFragment extends Fragment {
             cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), PAYMENT.DATE, " +
                     "CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, PAYMENT.ID_PAY FROM PAYMENT, CATEGORY " +
                     "WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND SUBSTR(PAYMENT.DATE, 1, 7)='" +
-                    MainActivity.getSpinnerDate() + "' GROUP BY PAYMENT.ID_PAY " +
-                    "ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
+                    MainActivity.getSpinnerDate() + "' AND PAYMENT.PAYING_ID='" + MainActivity.getPersonId() +
+                    "' GROUP BY PAYMENT.ID_PAY ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
         } catch (SQLiteException w) {
-            Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
         }
 
-        adapter = new ListOperationAdapter(cursor);
+        ListOperationAdapter adapter = new ListOperationAdapter(cursor);
         adapter.setOperationListener(new ListOperationAdapter.OperationListener() {
             @Override
             public void editOperation(int id) {
-                Intent intent = new Intent(getActivity(), OperationActivity.class);
-                intent.putExtra(OperationActivity.INT_EXTRA, 0);
-                intent.putExtra(OperationActivity.EDIT, id);
+                Intent intent = new Intent(getActivity(), ExpenseActivity.class);
+                intent.putExtra(ExpenseActivity.EDIT, id);
                 startActivityForResult(intent, 0);
             }
         });

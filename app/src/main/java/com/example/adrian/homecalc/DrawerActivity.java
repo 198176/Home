@@ -11,8 +11,6 @@ import android.view.View;
 public class DrawerActivity extends AppCompatActivity {
 
     private Intent fabIntent;
-    private Fragment fragment;
-    private FragmentManager manager;
 
 
     @Override
@@ -23,12 +21,12 @@ public class DrawerActivity extends AppCompatActivity {
         Intent intent = getIntent();
         int id = intent.getIntExtra("id", 0);
         setTitle(intent.getStringExtra("title"));
-        manager = getFragmentManager();
+        FragmentManager manager = getFragmentManager();
         switch (id) {
             case R.id.nav_home:
                 break;
             case R.id.nav_users:
-                fragment = new PersonFragment();
+                Fragment fragment = new PersonFragment();
                 fabIntent = new Intent(this, NewUserActivity.class);
                 manager.beginTransaction().add(R.id.drawer_fragment, fragment).commit();
                 break;
@@ -38,6 +36,9 @@ public class DrawerActivity extends AppCompatActivity {
                 manager.beginTransaction().add(R.id.drawer_fragment, fragment).commit();
                 break;
             case R.id.nav_arrears:
+                fragment = new ArrearFragment();
+                fabIntent = new Intent(this, NewRepaymentActivity.class);
+                manager.beginTransaction().add(R.id.drawer_fragment, fragment).commit();
                 break;
             default:
         }

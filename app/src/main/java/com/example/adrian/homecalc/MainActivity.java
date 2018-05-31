@@ -149,8 +149,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
             @Override
             public void onClick(View v) {
                 clickFab();
-                Intent intent = new Intent(MainActivity.this, OperationActivity.class);
-                intent.putExtra(OperationActivity.INT_EXTRA, 0);
+                Intent intent = new Intent(MainActivity.this, ExpenseActivity.class);
                 startActivityForResult(intent, 0);
             }
         });
@@ -207,8 +206,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
     public void setPerson(String text, int color, int ids) {
         TextDrawable textDrawable = TextDrawable.builder()
                 .buildRound(Character.toString(text.charAt(0)), color);
-        ImageView image = (ImageView) findViewById(R.id.fab_person);
-        image.setImageDrawable(textDrawable);
+        person.setImageDrawable(textDrawable);
         person_id = ids;
         refreshFragments();
     }

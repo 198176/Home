@@ -23,18 +23,15 @@ public class ListPersonOperationFragment extends Fragment {
     private SQLiteDatabase db;
     private Cursor cursor;
     private RecyclerView view;
-    private SQLiteOpenHelper helper;
-    private ListOperationAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try{
-            helper = new ApplicationDatabase(getActivity());
+            SQLiteOpenHelper helper = new ApplicationDatabase(getActivity());
             db = helper.getReadableDatabase();
         } catch(SQLiteException w){
-            Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -57,11 +54,10 @@ public class ListPersonOperationFragment extends Fragment {
                     MainActivity.getSpinnerDate() + "' AND PAYMENT.PERSON_ID='" +
                     MainActivity.getPersonId() + "' ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
         } catch (SQLiteException w) {
-            Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
         }
 
-        adapter = new ListOperationAdapter(cursor);
+        ListOperationAdapter adapter = new ListOperationAdapter(cursor);
         view.setAdapter(adapter);
     }
 
