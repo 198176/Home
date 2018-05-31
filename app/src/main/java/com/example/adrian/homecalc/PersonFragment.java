@@ -39,8 +39,7 @@ public class PersonFragment extends Fragment {
             db = helper.getReadableDatabase();
             cursor = db.query("PERSON", new String[]{"NAME", "COLOR", "_id"}, null, null, null, null, null);
         } catch(SQLiteException w){
-            Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
         }
         UserAdapter adapter = new UserAdapter(cursor);
         view.setAdapter(adapter);
@@ -50,7 +49,7 @@ public class PersonFragment extends Fragment {
             @Override
             public void setPerson(String text, int color, int id) {
                 Intent intent = new Intent(getActivity(), NewUserActivity.class);
-                intent.putExtra(NewUserActivity.EDIT, id);
+                intent.putExtra(OperationActivity.EDIT, id);
                 startActivityForResult(intent, 0);
             }
         });

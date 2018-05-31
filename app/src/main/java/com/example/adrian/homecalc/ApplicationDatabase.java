@@ -13,6 +13,7 @@ public class ApplicationDatabase extends SQLiteOpenHelper {
 
     public static final String CATEGORY = "CATEGORY";
     public static final String PERSON = "PERSON";
+    public static final String PAYMENT = "PAYMENT";
     public static final String NAME = "NAME";
     public static final String COLOR = "COLOR";
     public static final String ICON_ID = "ICON_ID";

@@ -58,7 +58,7 @@ public class ListOperationAdapter extends RecyclerView.Adapter<ListOperationAdap
             public boolean onLongClick(View view) {
                 if (listener != null) {
                     cursor.moveToPosition(position);
-                    listener.editOperation(cursor.getInt(6));
+                    listener.editOperation(cursor.getInt(6), (cursor.getDouble(1) > 0));
                 }
                 return false;
             }
@@ -75,7 +75,7 @@ public class ListOperationAdapter extends RecyclerView.Adapter<ListOperationAdap
     }
 
     interface OperationListener {
-        void editOperation(int id);
+        void editOperation(int id, boolean isPlus);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

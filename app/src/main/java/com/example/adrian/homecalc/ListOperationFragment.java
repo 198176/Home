@@ -26,6 +26,7 @@ public class ListOperationFragment extends Fragment {
     private SQLiteDatabase db;
     private Cursor cursor;
     private RecyclerView view;
+    private Toast toast;
 
     public ListOperationFragment() {
         // Required empty public constructor
@@ -34,6 +35,7 @@ public class ListOperationFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        toast = Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT);
         try {
             SQLiteOpenHelper helper = new ApplicationDatabase(getActivity());
             db = helper.getReadableDatabase();
@@ -41,7 +43,7 @@ public class ListOperationFragment extends Fragment {
 //                            "CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID FROM PAYMENT, CATEGORY "+
 //                            "WHERE PAYMENT.CATEGORY_ID=CATEGORY._id",null);
         } catch (SQLiteException w) {
-            Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
+            toast.show();
         }
     }
 
@@ -66,15 +68,20 @@ public class ListOperationFragment extends Fragment {
                     MainActivity.getSpinnerDate() + "' AND PAYMENT.PAYING_ID='" + MainActivity.getPersonId() +
                     "' GROUP BY PAYMENT.ID_PAY ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
         } catch (SQLiteException w) {
-            Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
+            toast.show();
         }
 
         ListOperationAdapter adapter = new ListOperationAdapter(cursor);
         adapter.setOperationListener(new ListOperationAdapter.OperationListener() {
             @Override
-            public void editOperation(int id) {
-                Intent intent = new Intent(getActivity(), ExpenseActivity.class);
-                intent.putExtra(ExpenseActivity.EDIT, id);
+            public void editOperation(int id, boolean isPlus) {
+                Intent intent = new Intent();
+                if (isPlus) {
+                    intent.setClass(getActivity(), OperationActivity.class);
+                } else {
+                    intent.setClass(getActivity(), ExpenseActivity.class);
+                }
+                intent.putExtra(OperationActivity.EDIT, id);
                 startActivityForResult(intent, 0);
             }
         });

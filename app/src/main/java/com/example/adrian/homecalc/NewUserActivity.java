@@ -26,11 +26,10 @@ import yuku.ambilwarna.AmbilWarnaDialog;
 
 public class NewUserActivity extends AppCompatActivity {
 
-    public static final String EDIT = "edit";
     private SQLiteDatabase db;
     private ImageView imageColor;
     private EditText title;
-    private int colour, id;
+    private int colour, idEdit;
     private ImageView image;
     private String name, cursorName;
 
@@ -40,7 +39,7 @@ public class NewUserActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_user);
         SQLiteOpenHelper helper = new ApplicationDatabase(this);
         db = helper.getWritableDatabase();
-        id = getIntent().getIntExtra(EDIT, -1);
+        idEdit = getIntent().getIntExtra(OperationActivity.EDIT, -1);
         title = (EditText) findViewById(R.id.new_title);
         imageColor = (ImageView) findViewById(R.id.new_color);
         Button button = (Button) findViewById(R.id.button_user);
@@ -55,10 +54,10 @@ public class NewUserActivity extends AppCompatActivity {
                 }
             }
         });
-        if (id != -1) {
+        if (idEdit != -1) {
             try {
-                Cursor cursor = db.query("PERSON", new String[]{"NAME", "COLOR", "_id"},
-                        "_id = ?", new String[]{Integer.toString(id)}, null, null, null);
+                Cursor cursor = db.rawQuery("SELECT NAME, COLOR, _id FROM PERSON WHERE _id = ?",
+                        new String[]{Integer.toString(idEdit)});
                 cursor.moveToFirst();
                 cursorName = cursor.getString(0);
                 title.setText(cursorName);
@@ -67,7 +66,7 @@ public class NewUserActivity extends AppCompatActivity {
                 button.setText("Edytuj");
                 cursor.close();
             } catch (SQLiteException w) {
-                Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
             }
         }
         Drawable drawable = imageColor.getBackground();
@@ -107,21 +106,20 @@ public class NewUserActivity extends AppCompatActivity {
     }
 
     public void createUser() {
-        Cursor cursor = db.query("PERSON", new String[]{"COUNT(NAME)"},
-                "NAME = ?", new String[]{name}, null, null, null);
+        Cursor cursor = db.rawQuery("SELECT COUNT(NAME) FROM PERSON WHERE NAME = ?", new String[]{name});
         cursor.moveToFirst();
         if (cursor.getInt(0) == 0 || name.equals(cursorName)) {
             ContentValues values = new ContentValues();
-            values.put("NAME", title.getText().toString());
-            values.put("COLOR", colour);
+            values.put(ApplicationDatabase.NAME, title.getText().toString());
+            values.put(ApplicationDatabase.COLOR, colour);
             try {
-                if (id == -1) {
-                    db.insert("PERSON", null, values);
+                if (idEdit == -1) {
+                    db.insert(ApplicationDatabase.PERSON, null, values);
                 } else {
-                    db.update("PERSON", values, "_id = ?", new String[]{Integer.toString(id)});
+                    db.update(ApplicationDatabase.PERSON, values, "_id = ?", new String[]{Integer.toString(idEdit)});
                 }
             } catch (SQLiteException w) {
-                Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
             }
             setResult(RESULT_OK, getSupportParentActivityIntent());
             finish();
@@ -133,15 +131,15 @@ public class NewUserActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (id != -1) {
+        if (idEdit != -1) {
             getMenuInflater().inflate(R.menu.menu_delete, menu);
             MenuItem menuItem = menu.findItem(R.id.action_delete);
             menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(NewUserActivity.this);
-                    builder.setTitle("Potwierdzenie")
-                            .setMessage("Czy na pewno chcesz usunąć użytkownika?")
+                    builder.setTitle(R.string.confirmation)
+                            .setMessage(R.string.ask_delete_user)
                             .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     deleteUser();
@@ -161,11 +159,11 @@ public class NewUserActivity extends AppCompatActivity {
 
     public void deleteUser() {
         try {
-            Cursor cursor = db.query("PAYMENT", new String[]{"COUNT(PERSON_ID)"},
-                    "PERSON_ID = ?", new String[]{Integer.toString(id)}, null, null, null);
+            Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM (SELECT PERSON_ID, PAYING_ID " +
+                    "FROM PAYMENT WHERE PERSON_ID = ? OR PAYING_ID = ?)", new String[]{Integer.toString(idEdit), Integer.toString(idEdit)});
             cursor.moveToFirst();
-            if (cursor.getInt(0) == 0) {
-                db.delete("PERSON", "_id = ?", new String[]{Integer.toString(id)});
+            if ((cursor.getInt(0) == 0) && (idEdit != 1)) {
+                db.delete(ApplicationDatabase.PERSON, "_id = ?", new String[]{Integer.toString(idEdit)});
                 setResult(RESULT_OK, getSupportParentActivityIntent());
                 finish();
             } else {
@@ -173,7 +171,7 @@ public class NewUserActivity extends AppCompatActivity {
             }
             cursor.close();
         } catch (SQLiteException w) {
-            Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
         }
     }
 

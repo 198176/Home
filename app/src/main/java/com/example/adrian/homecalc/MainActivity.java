@@ -127,8 +127,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
             cursor.moveToFirst();
             setPerson(cursor.getString(0), cursor.getInt(1), cursor.getInt(2));
         } catch (SQLiteException w) {
-            Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
         }
         person.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -160,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
             public void onClick(View v) {
                 clickFab();
                 Intent intent = new Intent(MainActivity.this, OperationActivity.class);
-                intent.putExtra(OperationActivity.INT_EXTRA, 1);
                 startActivityForResult(intent, 0);
             }
         });
@@ -197,8 +195,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
                 }
             });
         } catch (SQLiteException w) {
-            Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
         }
     }
 

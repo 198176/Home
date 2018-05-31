@@ -35,7 +35,6 @@ import static com.example.adrian.homecalc.OperationActivity.replaceStringToDoubl
 public class ExpenseActivity extends AppCompatActivity implements NumbersFragment.ValueListener,
         CategoryDialogFragment.CategoryListener, PersonDialogFragment.PersonListener {
 
-    public static final String EDIT = "edit";
     private SQLiteDatabase db;
     private SimpleDateFormat dateFormat;
     private Calendar dateTime = Calendar.getInstance();
@@ -58,12 +57,16 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
     private int idEdit = -1;
     private int place = -1;
     private ImageView imageUser;
+    private Toast toast;
+    private Cursor cursorParticipant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_expense);
-        idEdit = getIntent().getIntExtra(EDIT, -1);
+        idEdit = getIntent().getIntExtra(OperationActivity.EDIT, -1);
+        toast = Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT);
+        manager = getSupportFragmentManager();
         SQLiteOpenHelper helper = new ApplicationDatabase(this);
         db = helper.getWritableDatabase();
         valueText = (EditText) findViewById(R.id.value);
@@ -71,8 +74,30 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
         categoryText = (EditText) findViewById(R.id.category);
         dateText = (EditText) findViewById(R.id.date);
         imageUser = (ImageView) findViewById(R.id.user_value);
+        balance = (TextView) findViewById(R.id.balance);
+        Button button = (Button) findViewById(R.id.operation_button);
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        manager = getSupportFragmentManager();
+        RecyclerView participant = (RecyclerView) findViewById(R.id.participant);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        participant.setLayoutManager(layoutManager);
+
+        if (idEdit != -1) {
+            editFields();
+        } else {
+            setPaying(1);
+            updateDate();
+            try {
+                Cursor cursor = db.rawQuery("SELECT NAME, _id FROM CATEGORY WHERE DEFAULTS = 1", null);
+                if (cursor.moveToFirst()) {
+                    idCategory = cursor.getInt(1);
+                    categoryText.setText(cursor.getString(0));
+                    titleText.setHint(cursor.getString(0));
+                }
+                cursor.close();
+            } catch (SQLiteException w) {
+                toast.show();
+            }
+        }
 
         valueText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,36 +105,18 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
                 showNumbers();
             }
         });
-
         categoryText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showCategory();
             }
         });
-
         imageUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showPerson();
             }
         });
-
-        setPaying(1);
-
-        try {
-            Cursor cursor = db.query("CATEGORY", new String[]{"NAME", "_id"}, "DEFAULTS = 1", null, null, null, null);
-            if (cursor.moveToFirst()) {
-                idCategory = cursor.getInt(1);
-                categoryText.setText(cursor.getString(0));
-                titleText.setHint(cursor.getString(0));
-            }
-            cursor.close();
-        } catch (SQLiteException w) {
-            Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
-        }
-
-        updateDate();
         dateText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,16 +127,9 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
             }
         });
 
-        RecyclerView participant = (RecyclerView) findViewById(R.id.participant);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        participant.setLayoutManager(layoutManager);
-        balance = (TextView) findViewById(R.id.balance);
-        if (idEdit != -1) {
-            editFields();
-        }
         try {
-            Cursor cur = db.rawQuery("SELECT NAME, COLOR, _id FROM PERSON", null);
-            adapter = new UserAdapter(this, cur, sparseArray);
+            cursorParticipant = db.rawQuery("SELECT NAME, COLOR, _id FROM PERSON", null);
+            adapter = new UserAdapter(this, cursorParticipant, sparseArray);
             participant.setAdapter(adapter);
             adapter.setUserListener(new UserAdapter.UserListener() {
                 @Override
@@ -153,10 +153,9 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
                 }
             });
         } catch (SQLiteException w) {
-            Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
+            toast.show();
         }
 
-        final Button button = (Button) findViewById(R.id.operation_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -252,7 +251,7 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
             }
             cursor.close();
         } catch (SQLiteException w) {
-            Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
+            toast.show();
         }
     }
 
@@ -264,7 +263,7 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
             title = titleText.getHint().toString();
         }
         if (idEdit != -1) {
-            db.delete("PAYMENT", "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
+            db.delete(ApplicationDatabase.PAYMENT, "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
             id = idEdit;
         }
         for (int i = 0; i < sparseArray.size(); i++) {
@@ -283,10 +282,10 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
                 values.put("CATEGORY_ID", idCategory);
                 values.put("PERSON_ID", key);
                 values.put("PAYING_ID", idPaying);
-                db.insert("PAYMENT", null, values);
+                db.insert(ApplicationDatabase.PAYMENT, null, values);
 
             } catch (SQLiteException w) {
-                Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
+                toast.show();
             }
         }
         finish();
@@ -304,7 +303,7 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
     }
 
     private void editFields() {
-        setTitle("Edycja operacji");
+        setTitle(R.string.editing_operations);
         try {
             Cursor cursor = db.rawQuery("SELECT P.TITLE, P.VALUE, P.DATE, P.CATEGORY_ID, " +
                     "P.PERSON_ID, C.NAME, P.PAYING_ID FROM PAYMENT AS P, CATEGORY AS C WHERE P.CATEGORY_ID = C._id " +
@@ -317,13 +316,13 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
             setPaying(cursor.getInt(6));
             double cursorValue = 0;
             do {
-                cursorValue += (-1 * cursor.getDouble(1));
-                sparseArray.put(cursor.getInt(4), replaceDoubleToString(-1 * cursor.getDouble(1)));
+                cursorValue += Math.abs(cursor.getDouble(1));
+                sparseArray.put(cursor.getInt(4), replaceDoubleToString(Math.abs(cursor.getDouble(1))));
             } while (cursor.moveToNext());
             valueText.setText(replaceDoubleToString(cursorValue));
             cursor.close();
         } catch (SQLiteException w) {
-            Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
+            toast.show();
         }
     }
 
@@ -335,8 +334,8 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(ExpenseActivity.this);
-                    builder.setTitle("Potwierdzenie")
-                            .setMessage("Czy na pewno chcesz usunąć operacje?")
+                    builder.setTitle(R.string.confirmation)
+                            .setMessage(R.string.ask_delete_operation)
                             .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     deleteOperation();
@@ -355,7 +354,7 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
     }
 
     private void deleteOperation() {
-        db.delete("PAYMENT", "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
+        db.delete(ApplicationDatabase.PAYMENT, "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
         finish();
         setResult(RESULT_OK, getSupportParentActivityIntent());
     }
@@ -363,6 +362,7 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        cursorParticipant.close();
         db.close();
     }
 }

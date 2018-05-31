@@ -12,9 +12,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +19,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -31,10 +27,7 @@ import java.util.Calendar;
 public class OperationActivity extends AppCompatActivity implements NumbersFragment.ValueListener,
         CategoryDialogFragment.CategoryListener {
 
-    public static final String INT_EXTRA = "extra";
     public static final String EDIT = "edit";
-    private static final String DIALOG = "Dialog";
-
     private SimpleDateFormat dateFormat;
     private Calendar dateTime = Calendar.getInstance();
     private EditText dateText, valueText, categoryText, titleText;
@@ -48,40 +41,60 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
             updateDate();
         }
     };
-    private int day, month, year;
     private SQLiteDatabase db;
     private RadioGroup radioGroup;
-    private int ids, impact, idPlace;
+    private int ids;
     private double value;
-    private UserAdapter adapter;
-    private int place = -1;
     private int idEdit = -1;
-    private TextView balance;
     private boolean plus;
-    private SparseArray<String> sparseArray = new SparseArray<>();
+    private Toast toast;
+    private FragmentManager manager;
 
     public static String replaceDoubleToString(double value) {
         String text = String.format("%.2f", value);
         return (text.replace(".", ",") + " zł");
     }
 
+    public static double replaceStringToDouble(String text) {
+        return Double.parseDouble(text.replace(
+                ",", ".").substring(0, text.length() - 3));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_operation);
+        setContentView(R.layout.activity_operation);
         Intent intent = getIntent();
-        impact = intent.getIntExtra(INT_EXTRA, 0);
         idEdit = intent.getIntExtra(EDIT, -1);
+        toast = Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT);
+        manager = getSupportFragmentManager();
         SQLiteOpenHelper helper = new ApplicationDatabase(this);
         db = helper.getWritableDatabase();
+        valueText = (EditText) findViewById(R.id.value);
+        categoryText = (EditText) findViewById(R.id.category);
+        titleText = (EditText) findViewById(R.id.title);
+        dateText = (EditText) findViewById(R.id.date);
+        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+        Button button = (Button) findViewById(R.id.operation_button);
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        if (impact == 0) {
-            setContentView(R.layout.activity_expense);
-        } else {
-            setContentView(R.layout.activity_operation);
+        try {
+            if (idEdit != -1) {
+                editFields();
+            } else {
+                updateDate();
+                Cursor cursor = db.rawQuery("SELECT NAME, _id FROM CATEGORY WHERE DEFAULTS = 1", null);
+                if (cursor.moveToFirst()) {
+                    ids = cursor.getInt(1);
+                    categoryText.setText(cursor.getString(0));
+                    titleText.setHint(cursor.getString(0));
+                }
+                cursor.close();
+            }
+        } catch (SQLiteException w) {
+            toast.show();
         }
 
-        valueText = (EditText) findViewById(R.id.value);
         valueText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,9 +102,6 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
             }
         });
 
-        dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        categoryText = (EditText) findViewById(R.id.category);
         categoryText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,65 +109,25 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
             }
         });
 
-        titleText = (EditText) findViewById(R.id.title);
-
-        try {
-            Cursor cursor = db.query("CATEGORY", new String[]{"NAME", "_id"}, "DEFAULTS = 1", null, null, null, null);
-            if (cursor.moveToFirst()) {
-                ids = cursor.getInt(1);
-                categoryText.setText(cursor.getString(0));
-                titleText.setHint(cursor.getString(0));
-            }
-        } catch (SQLiteException w) {
-            Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-            toast.show();
-        }
-
-        dateText = (EditText) findViewById(R.id.date);
-        updateDate();
         dateText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                day = dateTime.get(Calendar.DAY_OF_MONTH);
-                month = dateTime.get(Calendar.MONTH);
-                year = dateTime.get(Calendar.YEAR);
+                int day = dateTime.get(Calendar.DAY_OF_MONTH);
+                int month = dateTime.get(Calendar.MONTH);
+                int year = dateTime.get(Calendar.YEAR);
                 new DatePickerDialog(OperationActivity.this, d, year, month, day).show();
             }
         });
 
-        final Button button = (Button) findViewById(R.id.operation_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (radioGroup != null) {
-                    int radioId = radioGroup.getCheckedRadioButtonId();
-                    plus = radioId == R.id.radio_profit;
-                }
+                int radioId = radioGroup.getCheckedRadioButtonId();
+                plus = radioId == R.id.radio_profit;
                 if (valueText.getText().length() != 0) {
                     value = replaceStringToDouble(valueText.getText().toString());
                     if (value != 0) {
-                        if (impact == 1) {
-                            createOperation();
-                        } else {
-                            if (replaceStringToDouble(balance.getText().toString()) == 0.0) {
-                                boolean flag = false;
-                                for (int i = 0; i < sparseArray.size(); i++) {
-                                    int key = sparseArray.keyAt(i);
-                                    if (replaceStringToDouble(sparseArray.get(key)) >= 0.0) {
-                                        flag = true;
-                                    } else {
-                                        Toast.makeText(OperationActivity.this, "Wartości nie mogą być ujemne", Toast.LENGTH_SHORT).show();
-                                        flag = false;
-                                        break;
-                                    }
-                                }
-                                if (flag) {
-                                    createOperations();
-                                }
-                            } else {
-                                Toast.makeText(OperationActivity.this, "Bilans musi być równy 0.0", Toast.LENGTH_SHORT).show();
-                            }
-                        }
+                        createOperation();
                     } else {
                         Toast.makeText(OperationActivity.this, "Wartość musi być większa od zera", Toast.LENGTH_SHORT).show();
                     }
@@ -166,47 +136,6 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
                 }
             }
         });
-
-        if (impact == 0) {
-            RecyclerView participant = (RecyclerView) findViewById(R.id.participant);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-            participant.setLayoutManager(layoutManager);
-            balance = (TextView) findViewById(R.id.balance);
-            if (idEdit != -1) {
-                editFields();
-            }
-            try {
-                Cursor cur = db.rawQuery("SELECT NAME, COLOR, _id FROM PERSON", null);
-                adapter = new UserAdapter(this, cur, sparseArray);
-                participant.setAdapter(adapter);
-                adapter.setUserListener(new UserAdapter.UserListener() {
-                    @Override
-                    public void setValue(int position, int id) {
-                        place = position;
-                        idPlace = id;
-                    }
-
-                    @Override
-                    public void setBalance(int position, int id) {
-                        double value = 0.0;
-                        if (sparseArray.get(id) != null) {
-                            value = replaceStringToDouble(sparseArray.get(id));
-                        }
-                        double balanceValue = replaceStringToDouble(balance.getText().toString());
-                        value += balanceValue;
-                        balanceValue = 0.0;
-                        sparseArray.put(id, replaceDoubleToString(value));
-                        balance.setText(replaceDoubleToString(balanceValue));
-                        adapter.notifyItemChanged(position);
-                    }
-                });
-            } catch (SQLiteException w) {
-                Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        } else {
-            radioGroup = (RadioGroup) findViewById(R.id.radio_group);
-        }
     }
 
     private void updateDate() {
@@ -215,25 +144,7 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
 
     @Override
     public void setValue(String text) {
-        if (place == -1) {
-            valueText.setText(text);
-        } else {
-            sparseArray.put(idPlace, text);
-            adapter.notifyItemChanged(place);
-            place = -1;
-        }
-        if (impact == 0) {
-            setBalance();
-        }
-    }
-
-    private void setBalance() {
-        Double val = replaceStringToDouble(valueText.getText().toString());
-        for (int i = 0; i < sparseArray.size(); i++) {
-            int key = sparseArray.keyAt(i);
-            val -= replaceStringToDouble(sparseArray.get(key));
-        }
-        balance.setText(replaceDoubleToString(val));
+        valueText.setText(text);
     }
 
     @Override
@@ -244,15 +155,11 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
     }
 
     private void showNumbers() {
-        FragmentManager manager = getSupportFragmentManager();
-        NumbersFragment fragment = new NumbersFragment();
-        fragment.show(manager, DIALOG);
+        new NumbersFragment().show(manager, "Dialog");
     }
 
     private void showCategory() {
-        FragmentManager manager = getSupportFragmentManager();
-        CategoryDialogFragment fragment = new CategoryDialogFragment();
-        fragment.show(manager, "Category");
+        new CategoryDialogFragment().show(manager, "Category");
     }
 
     private void createOperation() {
@@ -265,62 +172,24 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
             title = titleText.getHint().toString();
         }
         try {
-            values.put("ID_PAY", getId() + 1);
             values.put("TITLE", title);
             values.put("VALUE", value);
             values.put("DATE", dateText.getText().toString());
             values.put("CATEGORY_ID", ids);
-            values.put("PERSON_ID", 1);
-            db.insert("PAYMENT", null, values);
+            if (idEdit == -1) {
+                values.put("ID_PAY", getId() + 1);
+                values.put("PAYING_ID", 1);
+                values.put("PERSON_ID", 1);
+                db.insert(ApplicationDatabase.PAYMENT, null, values);
+            } else {
+                db.update(ApplicationDatabase.PAYMENT, values, "ID_PAY = ?",
+                        new String[]{Integer.toString(idEdit)});
+            }
         } catch (SQLiteException w) {
-            Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
             toast.show();
         }
         finish();
         startActivity(getSupportParentActivityIntent());
-    }
-
-    private void createOperations() {
-        ContentValues values = new ContentValues();
-        String title = titleText.getText().toString();
-        int id = getId() + 1;
-        if (title.length() == 0) {
-            title = titleText.getHint().toString();
-        }
-        if (idEdit != -1) {
-            db.delete("PAYMENT", "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
-            id = idEdit;
-        }
-        for (int i = 0; i < sparseArray.size(); i++) {
-            int key = sparseArray.keyAt(i);
-            double number = replaceStringToDouble(sparseArray.get(key));
-            if (number == 0.0) {
-                continue;
-            } else {
-                number *= -1;
-            }
-            try {
-                values.put("ID_PAY", id);
-                values.put("TITLE", title);
-                values.put("VALUE", number);
-                values.put("DATE", dateText.getText().toString());
-                values.put("CATEGORY_ID", ids);
-                values.put("PERSON_ID", key);
-                db.insert("PAYMENT", null, values);
-
-            } catch (SQLiteException w) {
-                Toast toast = Toast.makeText(this, "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-        }
-        finish();
-        setResult(RESULT_OK, getSupportParentActivityIntent());
-        //startActivity(getSupportParentActivityIntent());
-    }
-
-    public static double replaceStringToDouble(String text) {
-        return Double.parseDouble(text.replace(
-                ",", ".").substring(0, text.length() - 3));
     }
 
     private int getId() {
@@ -334,21 +203,16 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
     }
 
     private void editFields() {
-        setTitle("Edycja operacji");
+        setTitle(R.string.editing_operations);
         Cursor cursor = db.rawQuery("SELECT P.TITLE, P.VALUE, P.DATE, P.CATEGORY_ID, " +
-                "P.PERSON_ID, C.NAME FROM PAYMENT AS P, CATEGORY AS C WHERE P.CATEGORY_ID = C._id " +
+                "C.NAME FROM PAYMENT AS P, CATEGORY AS C WHERE P.CATEGORY_ID = C._id " +
                 "AND P.ID_PAY = " + idEdit, null);
         cursor.moveToFirst();
         titleText.setText(cursor.getString(0));
-        categoryText.setText(cursor.getString(5));
-        ids = cursor.getInt(3);
+        valueText.setText(replaceDoubleToString(cursor.getDouble(1)));
         dateText.setText(cursor.getString(2));
-        double cursorValue = 0;
-        do {
-            cursorValue += (-1 * cursor.getDouble(1));
-            sparseArray.put(cursor.getInt(4), replaceDoubleToString(-1 * cursor.getDouble(1)));
-        } while (cursor.moveToNext());
-        valueText.setText(replaceDoubleToString(cursorValue));
+        ids = cursor.getInt(3);
+        categoryText.setText(cursor.getString(4));
         cursor.close();
     }
 
@@ -360,8 +224,8 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(OperationActivity.this);
-                    builder.setTitle("Potwierdzenie")
-                            .setMessage("Czy na pewno chcesz usunąć operacje?")
+                    builder.setTitle(R.string.confirmation)
+                            .setMessage(R.string.ask_delete_operation)
                             .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     deleteOperation();
@@ -380,7 +244,7 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
     }
 
     private void deleteOperation() {
-        db.delete("PAYMENT", "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
+        db.delete(ApplicationDatabase.PAYMENT, "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
         finish();
         setResult(RESULT_OK, getSupportParentActivityIntent());
     }

@@ -22,4 +22,8 @@
     <string name="navigation_drawer_close">Zamknij szufladę</string>
     <string name="title_activity_new_user">Nowy użytkownik</string>
     <string name="database_error">Baza danych jest niedostępna</string>
+    <string name="editing_operations">Edycja operacji</string>
+    <string name="confirmation">Potwierdzenie</string>
+    <string name="ask_delete_operation">Czy na pewno chcesz usunąć operacje?</string>
+    <string name="ask_delete_user">Czy na pewno chcesz usunąć użytkownika?</string>
 </resources>
