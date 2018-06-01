@@ -1,12 +1,10 @@
 package com.example.adrian.homecalc;
 
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -39,7 +37,7 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements PersonDialogFragment.PersonListener,
-        NavigationView.OnNavigationItemSelectedListener{
+        NavigationView.OnNavigationItemSelectedListener {
 
     private static String spinner_date = "";
     private static int person_id = 1;
@@ -64,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
     private SQLiteDatabase db;
     private Spinner spinner;
     private DrawerLayout drawer;
+    private TextView textCost;
 
     public static String getSpinnerDate() {
         return spinner_date;
@@ -119,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
         fabRAnticlockwise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_anticlockwise);
         textPlus = (TextView) findViewById(R.id.plus_text);
         textMinus = (TextView) findViewById(R.id.minus_text);
+        textCost = (TextView) findViewById(R.id.text_cost);
 
         spinner = (Spinner) findViewById(R.id.spinner);
         person = (ImageView) findViewById(R.id.fab_person);
@@ -176,9 +176,10 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
 
     public void setSpinnerDate() {
         try {
-            Cursor cur = db.rawQuery("SELECT _id, SUBSTR(DATE, 1, 7) MONTH FROM PAYMENT GROUP BY MONTH ORDER BY MONTH DESC", null);
+            Cursor cursorDate = db.rawQuery("SELECT _id, SUBSTR(DATE, 1, 7) MONTH FROM PAYMENT " +
+                    "GROUP BY MONTH ORDER BY MONTH DESC", null);
             CursorAdapter listAdapter = new SimpleCursorAdapter(this, R.layout.spinner_date,
-                    cur, new String[]{"MONTH"}, new int[]{R.id.spinner_text}, 0);
+                    cursorDate, new String[]{"MONTH"}, new int[]{R.id.spinner_text}, 0);
             spinner.setAdapter(listAdapter);
             //spinner_date = String.valueOf(spinner.getContentDescription());
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -194,6 +195,19 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
 
                 }
             });
+        } catch (SQLiteException w) {
+            Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    void setAmountCost() {
+        try {
+            Cursor cursor = db.rawQuery("SELECT SUM(VALUE) FROM PAYMENT WHERE PERSON_ID = ? " +
+                    "AND SUBSTR(PAYMENT.DATE, 1, 7) = '" + getSpinnerDate() + "' AND ID_PAY != 0",
+                    new String[]{Integer.toString(person_id)});
+            cursor.moveToFirst();
+            textCost.setText(OperationActivity.replaceDoubleToString(cursor.getDouble(0)));
+            cursor.close();
         } catch (SQLiteException w) {
             Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
         }
@@ -215,6 +229,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
     }
 
     private void refreshFragments() {
+        setAmountCost();
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         if (fragmentList != null) {
             for (int i = 0; i < fragmentList.size(); i++) {
@@ -333,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
                 case 0:
                     return "Operacje";
                 case 1:
-                    return "Osoby";
+                    return "Koszty";
                 case 2:
                     return "Podsumowanie";
             }
