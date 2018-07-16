@@ -278,7 +278,7 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
                 values.put("ID_PAY", id);
                 values.put("TITLE", title);
                 values.put("VALUE", number);
-                values.put("DATE", dateText.getText().toString());
+                values.put("DATE", dateTime.getTimeInMillis());
                 values.put("CATEGORY_ID", idCategory);
                 values.put("PERSON_ID", key);
                 values.put("PAYING_ID", idPaying);
@@ -305,9 +305,9 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
     private void editFields() {
         setTitle(R.string.editing_operations);
         try {
-            Cursor cursor = db.rawQuery("SELECT P.TITLE, P.VALUE, P.DATE, P.CATEGORY_ID, " +
-                    "P.PERSON_ID, C.NAME, P.PAYING_ID FROM PAYMENT AS P, CATEGORY AS C WHERE P.CATEGORY_ID = C._id " +
-                    "AND P.ID_PAY = " + idEdit, null);
+            Cursor cursor = db.rawQuery("SELECT P.TITLE, P.VALUE, strftime('%Y-%m-%d', datetime(DATE/1000, 'unixepoch', 'localtime')), " +
+                    "P.CATEGORY_ID, P.PERSON_ID, C.NAME, P.PAYING_ID FROM PAYMENT AS P, CATEGORY AS C " +
+                    "WHERE P.CATEGORY_ID = C._id AND P.ID_PAY = " + idEdit, null);
             cursor.moveToFirst();
             titleText.setText(cursor.getString(0));
             categoryText.setText(cursor.getString(5));

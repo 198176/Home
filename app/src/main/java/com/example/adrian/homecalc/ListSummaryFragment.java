@@ -58,8 +58,7 @@ public class ListSummaryFragment extends Fragment {
             helper = new ApplicationDatabase(getActivity());
             db = helper.getReadableDatabase();
         } catch (SQLiteException w) {
-            Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
         }
 
         //BARENTRY = new ArrayList<>();
@@ -120,12 +119,15 @@ public class ListSummaryFragment extends Fragment {
     public void onStart() {
         super.onStart();
         try {
-            cursor = db.rawQuery("SELECT CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, CATEGORY._id, SUM(PAYMENT.VALUE) " +
-                    "FROM PAYMENT, CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND SUBSTR(PAYMENT.DATE, 1, 7)='" +
-                    MainActivity.getSpinnerDate() + "' AND PAYMENT.PERSON_ID='" +
-                    MainActivity.getPersonId() + "' AND PAYMENT.VALUE<0 GROUP BY CATEGORY._id", null);
+            cursor = db.rawQuery("SELECT CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, CATEGORY._id, " +
+                    "SUM(PAYMENT.VALUE), (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) " +
+                    "< strftime("+MainActivity.dayBilling+") THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) " +
+                    "ELSE strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH " +
+                    "FROM PAYMENT, CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND MONTH = '" +
+                    MainActivity.getSpinnerDate() + "' AND PAYMENT.PERSON_ID = '" + MainActivity.getPersonId() +
+                    "' AND PAYMENT.VALUE<0 GROUP BY CATEGORY._id", null);
         } catch (SQLiteException w) {
-            Toast toast = Toast.makeText(getActivity(), "Baza danych jest niedostępna", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT);
             toast.show();
         }
         adapter = new SummaryAdapter(cursor);
@@ -142,7 +144,7 @@ public class ListSummaryFragment extends Fragment {
                 //chart.setData(BARDATA);
                 pieChart.setData(pieData);
                 //chart.animateY(3000);
-                pieChart.animateY(3000);
+                pieChart.animateY(1000);
                 pieDataSet.setValueTextColor(0xFFFFFFFF);
                 pieDataSet.setValueTextSize(10f);
                 pieChart.setCenterText(OperationActivity.replaceDoubleToString(sum));

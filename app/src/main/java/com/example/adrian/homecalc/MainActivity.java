@@ -1,5 +1,6 @@
 package com.example.adrian.homecalc;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,6 +20,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -28,6 +30,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.NumberPicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
     private Spinner spinner;
     private DrawerLayout drawer;
     private TextView textCost;
+    public static int dayBilling = 1;
 
     public static String getSpinnerDate() {
         return spinner_date;
@@ -174,10 +178,37 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
         setSpinnerDate();
     }
 
+    void setBillingPeriod() {
+        View view = getLayoutInflater().inflate(R.layout.dialog_billing_period, null);
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("Pierwszy dzień miesiąca");
+        dialog.setView(view);
+        NumberPicker picker = (NumberPicker) view.findViewById(R.id.number_picker);
+        picker.setMinValue(1);
+        picker.setMaxValue(28);
+        picker.setValue(dayBilling);
+        picker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker numberPicker, int o, int n) {
+                dayBilling = n;
+            }
+        });
+        dialog.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                setSpinnerDate();
+                dialogInterface.dismiss();
+            }
+        });
+        dialog.create().show();
+    }
+
     public void setSpinnerDate() {
         try {
-            Cursor cursorDate = db.rawQuery("SELECT _id, SUBSTR(DATE, 1, 7) MONTH FROM PAYMENT " +
-                    "GROUP BY MONTH ORDER BY MONTH DESC", null);
+            Cursor cursorDate = db.rawQuery("SELECT _id, (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) " +
+                    "< strftime(" + dayBilling + ") THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) " +
+                    "ELSE strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH " +
+                    "FROM PAYMENT GROUP BY MONTH ORDER BY MONTH DESC", null);
             CursorAdapter listAdapter = new SimpleCursorAdapter(this, R.layout.spinner_date,
                     cursorDate, new String[]{"MONTH"}, new int[]{R.id.spinner_text}, 0);
             spinner.setAdapter(listAdapter);
@@ -202,9 +233,12 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
 
     void setAmountCost() {
         try {
-            Cursor cursor = db.rawQuery("SELECT SUM(VALUE) FROM PAYMENT WHERE PERSON_ID = ? " +
-                    "AND SUBSTR(PAYMENT.DATE, 1, 7) = '" + getSpinnerDate() + "' AND ID_PAY != 0",
-                    new String[]{Integer.toString(person_id)});
+            Cursor cursor = db.rawQuery("SELECT SUM(VALUE), (CASE WHEN cast(strftime('%d', " +
+                    "date(DATE/1000, 'unixepoch', 'localtime')) as integer) < strftime("+MainActivity.dayBilling+") " +
+                    "THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) " +
+                    "ELSE strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH " +
+                    "FROM PAYMENT WHERE PERSON_ID = ? AND MONTH = '" + getSpinnerDate() + "' " +
+                    "AND ID_PAY != 0", new String[]{Integer.toString(person_id)});
             cursor.moveToFirst();
             textCost.setText(OperationActivity.replaceDoubleToString(cursor.getDouble(0)));
             cursor.close();
@@ -278,7 +312,8 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_billing_period) {
+            setBillingPeriod();
             return true;
         }
 

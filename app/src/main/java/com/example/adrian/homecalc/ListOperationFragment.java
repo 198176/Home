@@ -62,11 +62,14 @@ public class ListOperationFragment extends Fragment {
     public void onStart() {
         super.onStart();
         try {
-            cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), PAYMENT.DATE, " +
-                    "CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, PAYMENT.ID_PAY FROM PAYMENT, CATEGORY " +
-                    "WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND SUBSTR(PAYMENT.DATE, 1, 7)='" +
-                    MainActivity.getSpinnerDate() + "' AND PAYMENT.PAYING_ID='" + MainActivity.getPersonId() +
-                    "' GROUP BY PAYMENT.ID_PAY ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
+            cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), strftime('%Y-%m-%d', " +
+                    "date(DATE/1000, 'unixepoch', 'localtime')), CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, " +
+                    "PAYMENT.ID_PAY, (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) < strftime("+MainActivity.dayBilling+") " +
+                    "THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) ELSE " +
+                    "strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH FROM PAYMENT, " +
+                    "CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND MONTH = '" + MainActivity.getSpinnerDate() +
+                    "' AND PAYMENT.PAYING_ID='" + MainActivity.getPersonId() + "' GROUP BY PAYMENT.ID_PAY " +
+                    "ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
         } catch (SQLiteException w) {
             toast.show();
         }

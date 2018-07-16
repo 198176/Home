@@ -174,7 +174,7 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
         try {
             values.put("TITLE", title);
             values.put("VALUE", value);
-            values.put("DATE", dateText.getText().toString());
+            values.put("DATE", dateTime.getTimeInMillis());
             values.put("CATEGORY_ID", ids);
             if (idEdit == -1) {
                 values.put("ID_PAY", getId() + 1);
@@ -204,8 +204,8 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
 
     private void editFields() {
         setTitle(R.string.editing_operations);
-        Cursor cursor = db.rawQuery("SELECT P.TITLE, P.VALUE, P.DATE, P.CATEGORY_ID, " +
-                "C.NAME FROM PAYMENT AS P, CATEGORY AS C WHERE P.CATEGORY_ID = C._id " +
+        Cursor cursor = db.rawQuery("SELECT P.TITLE, P.VALUE, strftime('%Y-%m-%d', datetime(DATE/1000, 'unixepoch', 'localtime')), " +
+                "P.CATEGORY_ID, C.NAME FROM PAYMENT AS P, CATEGORY AS C WHERE P.CATEGORY_ID = C._id " +
                 "AND P.ID_PAY = " + idEdit, null);
         cursor.moveToFirst();
         titleText.setText(cursor.getString(0));

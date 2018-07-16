@@ -47,7 +47,7 @@ public class ApplicationDatabase extends SQLiteOpenHelper {
         db.insert(PERSON, null, values);
 
         db.execSQL("CREATE TABLE PAYMENT (_id INTEGER PRIMARY KEY AUTOINCREMENT, ID_PAY INTEGER, "
-                + "TITLE TEXT, VALUE REAL, DATE TEXT, CATEGORY_ID INTEGER, PERSON_ID INTEGER, "
+                + "TITLE TEXT, VALUE REAL, DATE INTEGER, CATEGORY_ID INTEGER, PERSON_ID INTEGER, "
                 + "PAYING_ID INTEGER, FOREIGN KEY (CATEGORY_ID) REFERENCES CATEGORY (_id));");
     }
 
