@@ -2,6 +2,7 @@ package com.example.adrian.homecalc;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
     private DrawerLayout drawer;
     private TextView textCost;
     public static int dayBilling = 1;
+    private SharedPreferences preferences;
 
     public static String getSpinnerDate() {
         return spinner_date;
@@ -86,6 +88,8 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_drawer_main);
+        preferences = getSharedPreferences("prefer", 0);
+        dayBilling = preferences.getInt("day", 1);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -190,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
         picker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker numberPicker, int o, int n) {
+                preferences.edit().putInt("day", n).commit();
                 dayBilling = n;
             }
         });
