@@ -54,7 +54,8 @@ public class ListPersonOperationFragment extends Fragment {
                     "THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) ELSE " +
                     "strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH FROM PAYMENT, " +
                     "CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND MONTH = '" + MainActivity.getSpinnerDate() +
-                    "' AND PAYMENT.PERSON_ID='" + MainActivity.getPersonId() + "' ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
+                    "' AND DATE/1000 <= cast(strftime('%s', 'now') as integer) AND PAYMENT.PERSON_ID='" +
+                    MainActivity.getPersonId() + "' ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
         } catch (SQLiteException w) {
             Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
         }

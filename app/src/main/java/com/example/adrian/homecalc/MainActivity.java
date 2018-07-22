@@ -212,8 +212,8 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
         try {
             Cursor cursorDate = db.rawQuery("SELECT _id, (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) " +
                     "< strftime(" + dayBilling + ") THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) " +
-                    "ELSE strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH " +
-                    "FROM PAYMENT GROUP BY MONTH ORDER BY MONTH DESC", null);
+                    "ELSE strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH FROM PAYMENT " +
+                    "WHERE DATE/1000 <= cast(strftime('%s', 'now') as integer) GROUP BY MONTH ORDER BY MONTH DESC", null);
             CursorAdapter listAdapter = new SimpleCursorAdapter(this, R.layout.spinner_date,
                     cursorDate, new String[]{"MONTH"}, new int[]{R.id.spinner_text}, 0);
             spinner.setAdapter(listAdapter);
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
                     "THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) " +
                     "ELSE strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH " +
                     "FROM PAYMENT WHERE PERSON_ID = ? AND MONTH = '" + getSpinnerDate() + "' " +
-                    "AND ID_PAY != 0", new String[]{Integer.toString(person_id)});
+                    "AND DATE/1000 <= cast(strftime('%s', 'now') as integer) AND ID_PAY != 0", new String[]{Integer.toString(person_id)});
             cursor.moveToFirst();
             textCost.setText(OperationActivity.replaceDoubleToString(cursor.getDouble(0)));
             cursor.close();

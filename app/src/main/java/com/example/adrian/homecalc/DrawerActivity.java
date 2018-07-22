@@ -23,7 +23,13 @@ public class DrawerActivity extends AppCompatActivity {
         setTitle(intent.getStringExtra("title"));
         FragmentManager manager = getFragmentManager();
         switch (id) {
-            case R.id.nav_home:
+            case R.id.nav_planned:
+                ListOperationFragment operationFragment = new ListOperationFragment();
+                Bundle bundle = new Bundle();
+                bundle.putBoolean("planned", true);
+                operationFragment.setArguments(bundle);
+                fab.setVisibility(View.GONE);
+                getSupportFragmentManager().beginTransaction().add(R.id.drawer_fragment, operationFragment).commit();
                 break;
             case R.id.nav_users:
                 Fragment fragment = new PersonFragment();
@@ -40,7 +46,6 @@ public class DrawerActivity extends AppCompatActivity {
                 fabIntent = new Intent(this, NewRepaymentActivity.class);
                 manager.beginTransaction().add(R.id.drawer_fragment, fragment).commit();
                 break;
-            default:
         }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

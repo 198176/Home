@@ -27,6 +27,7 @@ public class ListOperationFragment extends Fragment {
     private Cursor cursor;
     private RecyclerView view;
     private Toast toast;
+    private Bundle bundle;
 
     public ListOperationFragment() {
         // Required empty public constructor
@@ -35,6 +36,7 @@ public class ListOperationFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        bundle = getArguments();
         toast = Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT);
         try {
             SQLiteOpenHelper helper = new ApplicationDatabase(getActivity());
@@ -62,14 +64,24 @@ public class ListOperationFragment extends Fragment {
     public void onStart() {
         super.onStart();
         try {
-            cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), strftime('%Y-%m-%d', " +
-                    "date(DATE/1000, 'unixepoch', 'localtime')), CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, " +
-                    "PAYMENT.ID_PAY, (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) < strftime("+MainActivity.dayBilling+") " +
-                    "THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) ELSE " +
-                    "strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH FROM PAYMENT, " +
-                    "CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND MONTH = '" + MainActivity.getSpinnerDate() +
-                    "' AND PAYMENT.PAYING_ID='" + MainActivity.getPersonId() + "' GROUP BY PAYMENT.ID_PAY " +
-                    "ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
+            if (bundle != null) {
+                if(bundle.containsKey("planned") && bundle.getBoolean("planned")) {
+                    cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), strftime('%Y-%m-%d', " +
+                            "date(DATE/1000, 'unixepoch', 'localtime')), CATEGORY.NAME, CATEGORY.COLOR, " +
+                            "CATEGORY.ICON_ID, PAYMENT.ID_PAY FROM PAYMENT, CATEGORY WHERE PAYMENT.CATEGORY_ID " +
+                            "= CATEGORY._id AND DATE/1000 > cast(strftime('%s', 'now') as integer) " +
+                            "GROUP BY PAYMENT.ID_PAY ORDER BY PAYMENT.DATE ASC, PAYMENT._id DESC", null);
+                }
+            } else {
+                cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), strftime('%Y-%m-%d', " +
+                        "date(DATE/1000, 'unixepoch', 'localtime')), CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, " +
+                        "PAYMENT.ID_PAY, (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) < strftime("+MainActivity.dayBilling+") " +
+                        "THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) ELSE " +
+                        "strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH FROM PAYMENT, " +
+                        "CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND MONTH = '" + MainActivity.getSpinnerDate() +
+                        "' AND PAYMENT.PAYING_ID = '" + MainActivity.getPersonId() + "' AND DATE/1000 <= cast(strftime('%s', 'now') as integer) " +
+                        "GROUP BY PAYMENT.ID_PAY ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
+            }
         } catch (SQLiteException w) {
             toast.show();
         }
