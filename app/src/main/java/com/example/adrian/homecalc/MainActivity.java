@@ -80,8 +80,20 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
 //        setSpinnerDate();
 //    }
 
-    public static int getPersonId() {
-        return person_id;
+    public static String getPersonId() {
+        if(person_id == -1) {
+            return "";
+        } else {
+            return "PERSON_ID = " + person_id + " AND";
+        }
+    }
+
+    public static String getPayingId() {
+        if(person_id == -1) {
+            return "";
+        } else {
+            return "PAYING_ID = " + person_id + " AND";
+        }
     }
 
     @Override
@@ -242,8 +254,8 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
                     "date(DATE/1000, 'unixepoch', 'localtime')) as integer) < strftime("+MainActivity.dayBilling+") " +
                     "THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) " +
                     "ELSE strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH " +
-                    "FROM PAYMENT WHERE PERSON_ID = ? AND MONTH = '" + getSpinnerDate() + "' " +
-                    "AND DATE/1000 <= cast(strftime('%s', 'now') as integer) AND ID_PAY != 0", new String[]{Integer.toString(person_id)});
+                    "FROM PAYMENT WHERE " + getPersonId() + " MONTH = '" + getSpinnerDate() + "' " +
+                    "AND DATE/1000 <= cast(strftime('%s', 'now') as integer) AND ID_PAY != 0", null);
             cursor.moveToFirst();
             textCost.setText(OperationActivity.replaceDoubleToString(cursor.getDouble(0)));
             cursor.close();
@@ -254,16 +266,24 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
 
     @Override
     public void setPerson(String text, int color, int ids) {
-        TextDrawable textDrawable = TextDrawable.builder()
-                .buildRound(Character.toString(text.charAt(0)), color);
-        person.setImageDrawable(textDrawable);
-        person_id = ids;
+        if (color == -1) {
+            person.setImageResource(ids);
+            person_id = color;
+        } else {
+            TextDrawable textDrawable = TextDrawable.builder()
+                    .buildRound(Character.toString(text.charAt(0)), color);
+            person.setImageDrawable(textDrawable);
+            person_id = ids;
+        }
         refreshFragments();
     }
 
     private void showPerson() {
         FragmentManager manager = getSupportFragmentManager();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(PersonDialogFragment.ALL, true);
         PersonDialogFragment fragment = new PersonDialogFragment();
+        fragment.setArguments(bundle);
         fragment.show(manager, "Person");
     }
 

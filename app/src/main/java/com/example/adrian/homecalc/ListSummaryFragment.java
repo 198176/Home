@@ -123,9 +123,9 @@ public class ListSummaryFragment extends Fragment {
                     "SUM(PAYMENT.VALUE), (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) " +
                     "< strftime("+MainActivity.dayBilling+") THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) " +
                     "ELSE strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH " +
-                    "FROM PAYMENT, CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND MONTH = '" +
-                    MainActivity.getSpinnerDate() + "' AND PAYMENT.PERSON_ID = '" + MainActivity.getPersonId() +
-                    "' AND DATE/1000 <= cast(strftime('%s', 'now') as integer) AND PAYMENT.VALUE<0 GROUP BY CATEGORY._id", null);
+                    "FROM PAYMENT, CATEGORY WHERE " + MainActivity.getPersonId() + " PAYMENT.CATEGORY_ID=CATEGORY._id " +
+                    "AND MONTH = '" + MainActivity.getSpinnerDate() + "' AND DATE/1000 <= cast(strftime('%s', 'now') as integer) " +
+                    "AND PAYMENT.VALUE<0 GROUP BY CATEGORY._id", null);
         } catch (SQLiteException w) {
             Toast toast = Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT);
             toast.show();
