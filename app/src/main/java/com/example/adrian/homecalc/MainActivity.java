@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
     private Spinner spinner;
     private DrawerLayout drawer;
     private TextView textCost;
+    private TextView textTotal;
     public static int dayBilling = 1;
     private SharedPreferences preferences;
 
@@ -138,8 +139,8 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
         fabRAnticlockwise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_anticlockwise);
         textPlus = (TextView) findViewById(R.id.plus_text);
         textMinus = (TextView) findViewById(R.id.minus_text);
-        textCost = (TextView) findViewById(R.id.text_cost);
-
+        textCost = (TextView) findViewById(R.id.monthly_balance);
+        textTotal = findViewById(R.id.total_balance);
         spinner = (Spinner) findViewById(R.id.spinner);
         person = (ImageView) findViewById(R.id.fab_person);
         try {
@@ -258,6 +259,10 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
                     "AND DATE/1000 <= cast(strftime('%s', 'now') as integer) AND ID_PAY != 0", null);
             cursor.moveToFirst();
             textCost.setText(OperationActivity.replaceDoubleToString(cursor.getDouble(0)));
+            cursor = db.rawQuery("SELECT SUM(CASE WHEN ID_PAY == 0 THEN ABS(VALUE) ELSE VALUE END) " +
+                    "FROM PAYMENT WHERE PAYING_ID = 1 OR (ID_PAY == 0 AND PERSON_ID == 1)", null);
+            cursor.moveToFirst();
+            textTotal.setText(OperationActivity.replaceDoubleToString(cursor.getDouble(0)));
             cursor.close();
         } catch (SQLiteException w) {
             Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
