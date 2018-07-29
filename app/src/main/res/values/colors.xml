@@ -3,6 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#3F51B5</color>
-    <color name="fab1_color">#4CAF50</color>
-    <color name="fab2_color">#D50000</color>
+    <color name="green_color">#43A047</color>
+    <color name="dark_green_color">#1B5E20</color>
+    <color name="red_color">#D50000</color>
+    <color name="dark_red_color">#B71C1C</color>
+    <color name="blue_color">#1976D2</color>
 </resources>

@@ -61,7 +61,7 @@ public class ApplicationDatabase extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE PERSON (_id INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT, COLOR INTEGER);");
         ContentValues values = new ContentValues();
         values.put(NAME, "Ja");
-        values.put(COLOR, 0xFF03A9F4);
+        values.put(COLOR, 0xFF1976D2);
         db.insert(PERSON, null, values);
 
         db.execSQL("CREATE TABLE PAYMENT (_id INTEGER PRIMARY KEY AUTOINCREMENT, ID_PAY INTEGER, "

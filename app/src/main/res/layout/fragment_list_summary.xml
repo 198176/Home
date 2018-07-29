@@ -1,18 +1,38 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.adrian.homecalc.ListSummaryFragment">
+    android:layout_height="match_parent">
 
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/chart1"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp" />
+        android:layout_height="wrap_content">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/summary_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/chart1"/>
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/chart1"
+            android:layout_width="match_parent"
+            android:layout_height="300dp" />
 
-</RelativeLayout>
+        <ToggleButton
+            android:id="@+id/summary_toggle"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:background="@color/blue_color"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/cardview_light_background"
+            android:textOff="@string/income"
+            android:textOn="@string/expenses"
+            android:textStyle="bold"
+            android:layout_marginTop="@dimen/appbar_padding_top"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chart1" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/summary_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/appbar_padding_top"
+            app:layout_constraintTop_toBottomOf="@id/summary_toggle" />
+
+    </android.support.constraint.ConstraintLayout>
+</android.support.v4.widget.NestedScrollView>

@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -44,6 +45,7 @@ public class ListSummaryFragment extends Fragment {
     private Cursor cursor;
     private View view;
     private RecyclerView rview;
+    private ToggleButton toggleButton;
     private SQLiteOpenHelper helper;
     private SummaryAdapter adapter;
 
@@ -104,7 +106,8 @@ public class ListSummaryFragment extends Fragment {
         rview = (RecyclerView) view.findViewById(R.id.summary_recycler);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         rview.setLayoutManager(layoutManager);
-
+        rview.setNestedScrollingEnabled(false);
+        toggleButton = view.findViewById(R.id.summary_toggle);
         //chart = (BarChart) view.findViewById(R.id.chart1);
         pieChart = (PieChart) view.findViewById(R.id.chart1);
 
@@ -119,13 +122,25 @@ public class ListSummaryFragment extends Fragment {
     public void onStart() {
         super.onStart();
         try {
+            String mark;
+            if(toggleButton.isChecked()){
+                mark = "<";
+            } else {
+                mark = ">";
+            }
+            toggleButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onStart();
+                }
+            });
             cursor = db.rawQuery("SELECT CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, CATEGORY._id, " +
                     "SUM(PAYMENT.VALUE), (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) " +
                     "< strftime("+MainActivity.dayBilling+") THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) " +
                     "ELSE strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH " +
                     "FROM PAYMENT, CATEGORY WHERE " + MainActivity.getPersonId() + " PAYMENT.CATEGORY_ID=CATEGORY._id " +
                     "AND MONTH = '" + MainActivity.getSpinnerDate() + "' AND DATE/1000 <= cast(strftime('%s', 'now') as integer) " +
-                    "AND PAYMENT.VALUE<0 GROUP BY CATEGORY._id", null);
+                    "AND PAYMENT.VALUE" + mark + "0 GROUP BY CATEGORY._id", null);
         } catch (SQLiteException w) {
             Toast toast = Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT);
             toast.show();

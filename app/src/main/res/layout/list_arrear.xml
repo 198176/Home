@@ -32,7 +32,7 @@
             android:layout_marginStart="10dp"
             android:layout_alignBottom="@+id/image_user_from"
             android:layout_toEndOf="@+id/image_user_from"
-            android:textColor="@color/fab2_color" />
+            android:textColor="@color/red_color" />
         <ImageView
             android:layout_width="45dp"
             android:layout_height="45dp"

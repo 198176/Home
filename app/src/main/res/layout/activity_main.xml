@@ -64,7 +64,7 @@
             android:visibility="invisible"
             android:elevation="6dp"
             app:pressedTranslationZ="12dp"
-            app:backgroundTint="@color/fab2_color"/>
+            app:backgroundTint="@color/red_color"/>
 
         <TextView
             android:id="@+id/minus_text"
@@ -91,7 +91,7 @@
             android:src="@drawable/ic_add"
             android:visibility="invisible"
             app:pressedTranslationZ="12dp"
-            app:backgroundTint="@color/fab1_color"
+            app:backgroundTint="@color/green_color"
             />
 
         <TextView
@@ -105,8 +105,7 @@
             android:background="@android:drawable/dialog_holo_dark_frame"
             android:textColor="#FFFFFF"
             android:gravity="center"
-            android:visibility="invisible"
-            />
+            android:visibility="invisible" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
@@ -117,7 +116,8 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:src="@drawable/ic_add"
-            app:pressedTranslationZ="12dp"/>
+            app:pressedTranslationZ="12dp"
+            app:backgroundTint="@color/blue_color"/>
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_cost"

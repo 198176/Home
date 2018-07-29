@@ -26,4 +26,6 @@
     <string name="confirmation">Potwierdzenie</string>
     <string name="ask_delete_operation">Czy na pewno chcesz usunąć operacje?</string>
     <string name="ask_delete_user">Czy na pewno chcesz usunąć użytkownika?</string>
+    <string name="income">WPŁYWY</string>
+    <string name="expenses">WYDATKI</string>
 </resources>
