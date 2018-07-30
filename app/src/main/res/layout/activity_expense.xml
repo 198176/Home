@@ -7,128 +7,193 @@
     android:layout_width="match_parent"
     tools:context="com.example.adrian.homecalc.OperationActivity">
 
-<LinearLayout
+<android.support.constraint.ConstraintLayout
     android:id="@+id/container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_height="wrap_content"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:padding="@dimen/fab_margin">
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/value_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/fab_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="@dimen/fab_margin"
         android:text="@string/value" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
         <ImageView
             android:id="@+id/user_value"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
-            android:layout_gravity="center"/>
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="@dimen/fab_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/barrier"
+            app:layout_constraintTop_toBottomOf="@id/value_text"
+            app:layout_constraintBottom_toBottomOf="@id/value" />
 
         <EditText
             android:id="@+id/value"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/fab_margin"
+            app:layout_constraintTop_toBottomOf="@id/value_text"
+            app:layout_constraintStart_toEndOf="@id/barrier"
+            app:layout_constraintEnd_toEndOf="parent"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="0,00 zł"
             android:cursorVisible="false"
             android:focusable="false"
             android:focusableInTouchMode="false" />
-    </LinearLayout>
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/title_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/value"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginTop="@dimen/fab_margin"
         android:text="Tytuł" />
 
+    <ImageView
+        android:id="@+id/title_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/user_value"
+        app:layout_constraintTop_toBottomOf="@id/title_text"
+        app:layout_constraintBottom_toBottomOf="@id/title"
+        android:src="@drawable/ic_title"/>
+
     <EditText
         android:id="@+id/title"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/fab_margin"
+        app:layout_constraintTop_toBottomOf="@id/title_text"
+        app:layout_constraintStart_toEndOf="@id/barrier"
+        app:layout_constraintEnd_toEndOf="parent"
         android:hint="Tytuł"
         android:inputType="textCapSentences"
         android:imeOptions="actionDone"/>
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/category_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
         android:layout_marginTop="@dimen/fab_margin"
         android:text="Kategoria" />
 
+    <ImageView
+        android:id="@+id/category_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/user_value"
+        app:layout_constraintTop_toBottomOf="@id/category_text"
+        app:layout_constraintBottom_toBottomOf="@id/category"
+        android:src="@drawable/ic_style_category"/>
+
     <EditText
         android:id="@+id/category"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/fab_margin"
+        app:layout_constraintStart_toEndOf="@id/barrier"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/category_text"
         android:hint="Kategoria"
         android:cursorVisible="false"
         android:focusable="false"
         android:focusableInTouchMode="false"/>
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/date_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/category"
         android:layout_marginTop="@dimen/fab_margin"
         android:text="Data" />
 
+    <ImageView
+        android:id="@+id/date_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/user_value"
+        app:layout_constraintTop_toBottomOf="@id/date_text"
+        app:layout_constraintBottom_toBottomOf="@id/date"
+        android:src="@drawable/ic_date"/>
+
     <EditText
         android:id="@+id/date"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/date_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/barrier"
         android:layout_marginBottom="@dimen/fab_margin"
         android:cursorVisible="false"
         android:focusable="false"
         android:focusableInTouchMode="false"/>
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/members_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/date"
         android:layout_marginTop="@dimen/fab_margin"
         android:text="Uczestnicy" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
         <TextView
             android:id="@+id/balance_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/members_text"
+            app:layout_constraintEnd_toStartOf="@id/balance"
+            android:layout_marginEnd="@dimen/fab_margin"
             android:text="Bilans:" />
         <TextView
             android:id="@+id/balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/balance_text"
-            android:layout_marginStart="@dimen/fab_margin"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="@id/members_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="@dimen/fab_margin"
             android:text="0,00 zł"/>
-    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/participant"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/members_text"/>
 
     <Button
         android:id="@+id/operation_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
+        app:layout_constraintTop_toBottomOf="@id/participant"
+        app:layout_constraintEnd_toEndOf="parent"
         android:background="@drawable/custom_button"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="OK"/>
-</LinearLayout>
+
+    <android.support.constraint.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="start"
+        app:constraint_referenced_ids="value, title, category, date"/>
+</android.support.constraint.ConstraintLayout>
 
 
 

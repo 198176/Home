@@ -70,10 +70,10 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
         manager = getSupportFragmentManager();
         SQLiteOpenHelper helper = new ApplicationDatabase(this);
         db = helper.getWritableDatabase();
-        valueText = (EditText) findViewById(R.id.value);
-        categoryText = (EditText) findViewById(R.id.category);
-        titleText = (EditText) findViewById(R.id.title);
-        dateText = (EditText) findViewById(R.id.date);
+        valueText = (EditText) findViewById(R.id.operation_value);
+        categoryText = (EditText) findViewById(R.id.operation_category);
+        titleText = (EditText) findViewById(R.id.operation_title);
+        dateText = (EditText) findViewById(R.id.operation_date);
         radioGroup = (RadioGroup) findViewById(R.id.radio_group);
         Button button = (Button) findViewById(R.id.operation_button);
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");

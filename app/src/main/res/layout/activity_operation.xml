@@ -1,122 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="vertical"
-    android:orientation="vertical"
-    android:padding="@dimen/fab_margin"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:padding="@dimen/fab_margin"
     tools:context="com.example.adrian.homecalc.OperationActivity">
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/operation_value_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginTop="@dimen/fab_margin"
-        android:text="@string/value" />
+        android:text="@string/value"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/operation_value_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_value"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/operation_value"
+        app:layout_constraintTop_toBottomOf="@id/operation_value_text" />
 
     <EditText
-        android:id="@+id/value"
-        android:layout_width="match_parent"
+        android:id="@+id/operation_value"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/fab_margin"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:cursorVisible="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:hint="0.00 zł"
-        android:cursorVisible="false"
-        android:focusable="false"
-        android:focusableInTouchMode="false" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/fab_margin"
-            android:text="@string/title" />
-
-        <EditText
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/fab_margin"
-            android:hint="@string/title"
-            android:inputType="textCapSentences"
-            android:imeOptions="actionDone"/>
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/operation_value_image"
+        app:layout_constraintTop_toBottomOf="@id/operation_value_text" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/operation_title_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginTop="@dimen/fab_margin"
-        android:text="@string/category" />
+        android:text="@string/title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/operation_value" />
+
+    <ImageView
+        android:id="@+id/operation_title_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_title"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/operation_title"
+        app:layout_constraintTop_toBottomOf="@id/operation_title_text" />
 
     <EditText
-        android:id="@+id/category"
-        android:layout_width="match_parent"
+        android:id="@+id/operation_title"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/fab_margin"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:hint="@string/title"
+        android:imeOptions="actionDone"
+        android:inputType="textCapSentences"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/operation_title_image"
+        app:layout_constraintTop_toBottomOf="@id/operation_title_text" />
+
+    <TextView
+        android:id="@+id/operation_category_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginTop="@dimen/fab_margin"
+        android:text="@string/category"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/operation_title" />
+
+    <ImageView
+        android:id="@+id/operation_category_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_style_category"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/operation_category"
+        app:layout_constraintTop_toBottomOf="@id/operation_category_text" />
+
+    <EditText
+        android:id="@+id/operation_category"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:cursorVisible="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:hint="@string/category"
-        android:cursorVisible="false"
-        android:focusable="false"
-        android:focusableInTouchMode="false"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/operation_category_image"
+        app:layout_constraintTop_toBottomOf="@id/operation_category_text" />
 
     <TextView
-        android:layout_width="match_parent"
+        android:id="@+id/operation_date_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginTop="@dimen/fab_margin"
-        android:text="@string/date" />
+        android:text="@string/date"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/operation_category" />
+
+    <ImageView
+        android:id="@+id/operation_date_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_date"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/operation_date"
+        app:layout_constraintTop_toBottomOf="@id/operation_date_text" />
 
     <EditText
-        android:id="@+id/date"
-        android:layout_width="match_parent"
+        android:id="@+id/operation_date"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/fab_margin"
+        android:layout_marginStart="@dimen/fab_margin"
         android:cursorVisible="false"
         android:focusable="false"
-        android:focusableInTouchMode="false"/>
+        android:focusableInTouchMode="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/operation_date_image"
+        app:layout_constraintTop_toBottomOf="@id/operation_date_text" />
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <Button
-            android:id="@+id/operation_button"
+    <TextView
+        android:id="@+id/operation_type_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginTop="@dimen/fab_margin"
+        android:text="Rodzaj"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/operation_date" />
+
+    <ImageView
+        android:id="@+id/operation_type_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_type"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/radio_group"
+        app:layout_constraintTop_toBottomOf="@id/operation_type_text" />
+
+    <RadioGroup
+        android:id="@+id/radio_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        app:layout_constraintBottom_toBottomOf="@id/operation_type_image"
+        app:layout_constraintStart_toEndOf="@id/operation_type_image"
+        app:layout_constraintTop_toBottomOf="@id/operation_type_text">
+
+        <RadioButton
+            android:id="@+id/radio_profit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:background="@drawable/custom_button"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="OK"/>
+            android:checked="true"
+            android:text="Dochód" />
 
-        <RadioGroup
-            android:id="@+id/radio_group"
+        <RadioButton
+            android:id="@+id/radio_expense"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-            <RadioButton
-                android:id="@+id/radio_profit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Dochód"/>
-            <RadioButton
-                android:id="@+id/radio_expense"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Wydatek"/>
-        </RadioGroup>
-    </FrameLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/fab_margin"
+            android:text="Wydatek" />
+    </RadioGroup>
 
+    <Button
+        android:id="@+id/operation_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_button"
+        android:text="OK"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-
-
-
-    <!--<android.support.design.widget.BottomNavigationView-->
-        <!--android:id="@+id/navigation"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="bottom"-->
-        <!--android:background="?android:attr/galleryItemBackground"-->
-        <!--app:menu="@menu/navigation" />-->
-
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>
