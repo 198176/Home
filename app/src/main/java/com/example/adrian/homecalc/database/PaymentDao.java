@@ -20,7 +20,7 @@ public interface PaymentDao {
     int getLastId();
 
     @Insert
-    void insert(Payment... payments);
+    long[] insert(Payment... payments);
 
     @Update
     void update(Payment... payments);

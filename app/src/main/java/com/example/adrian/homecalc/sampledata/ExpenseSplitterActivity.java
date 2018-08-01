@@ -30,7 +30,6 @@ import com.example.adrian.homecalc.PersonDialogFragment;
 import com.example.adrian.homecalc.R;
 import com.example.adrian.homecalc.adapter.UserAdapterR;
 import com.example.adrian.homecalc.database.DBCallback;
-import com.example.adrian.homecalc.database.ParticipantDBUtils;
 import com.example.adrian.homecalc.database.PaymentDBUtils;
 import com.example.adrian.homecalc.database.UserDBUtils;
 import com.example.adrian.homecalc.model.Category;
@@ -293,16 +292,16 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
 
     private void createOperations() {
         String title = titleText.getText().toString();
-        int id = getId() + 1;
+        //int id = getId() + 1;
         if (title.length() == 0) {
             title = titleText.getHint().toString();
         }
         if (idEdit != -1) {
             //db.delete(ApplicationDatabase.PAYMENT, "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
-            id = idEdit;
+            //id = idEdit;
         }
         try {
-            PaymentDBUtils.insert(new Payment(title, value, dateTime.getTimeInMillis(), idCategory, idPaying));
+            ArrayList<Participant> participants = new ArrayList<>();
             for (int i = 0; i < sparseArray.size(); i++) {
                 int key = sparseArray.keyAt(i);
                 double number = replaceStringToDouble(sparseArray.get(key));
@@ -311,8 +310,9 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
                 } else {
                     number *= -1;
                 }
-                ParticipantDBUtils.insert(new Participant(id, key, number));
+                participants.add(new Participant(key, number));
             }
+            PaymentDBUtils.insert(new Payment(title, value, dateTime.getTimeInMillis(), idCategory, idPaying, participants));
         } catch (SQLiteException w) {
             toast.show();
         }

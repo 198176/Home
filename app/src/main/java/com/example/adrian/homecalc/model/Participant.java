@@ -1,6 +1,7 @@
 package com.example.adrian.homecalc.model;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "Participants")
@@ -8,11 +9,17 @@ public class Participant {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
-    private int payment_id;
+    private long payment_id;
     private int user_id;
     private double user_value;
 
-    public Participant(int payment_id, int user_id, double user_value) {
+    @Ignore
+    public Participant(int user_id, double user_value){
+        this.user_id = user_id;
+        this.user_value = user_value;
+    }
+
+    public Participant(long payment_id, int user_id, double user_value) {
         this.payment_id = payment_id;
         this.user_id = user_id;
         this.user_value = user_value;
@@ -42,11 +49,11 @@ public class Participant {
         this.user_value = user_value;
     }
 
-    public int getPayment_id() {
+    public long getPayment_id() {
         return payment_id;
     }
 
-    public void setPayment_id(int payment_id) {
+    public void setPayment_id(long payment_id) {
         this.payment_id = payment_id;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.adrian.homecalc.database;
 
 import com.example.adrian.homecalc.MyApplication;
+import com.example.adrian.homecalc.model.Participant;
 import com.example.adrian.homecalc.model.Payment;
 
 public abstract class PaymentDBUtils {
@@ -36,7 +37,11 @@ public abstract class PaymentDBUtils {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                MyApplication.getHomeRoomDatabase().paymentDao().insert(payment);
+                long[] id = MyApplication.getHomeRoomDatabase().paymentDao().insert(payment);
+                for (Participant participant : payment.getParticipants()){
+                    participant.setPayment_id(id[0]);
+                    MyApplication.getHomeRoomDatabase().participantDao().insert(participant);
+                }
             }
         }).start();
     }

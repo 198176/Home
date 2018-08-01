@@ -135,13 +135,13 @@ public class UserAdapterR extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             image.setImageDrawable(textDrawable);
             if (sparseArray != null) {
                 if (sparseArray.size() != 0) {
-                    value.setText(sparseArray.get(cursor.getInt(2)));
+                    value.setText(sparseArray.get(user.getId()));
                 }
                 imageButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (userListener != null) {
-                            userListener.setBalance(position, cursor.getInt(2));
+                            userListener.setBalance(position, user.getId());
                         }
                     }
                 });
@@ -150,7 +150,7 @@ public class UserAdapterR extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     public void onClick(View v) {
                         showNumbers();
                         if (userListener != null) {
-                            userListener.setValue(position, cursor.getInt(2));
+                            userListener.setValue(position, user.getId());
                         }
                     }
                 });
@@ -160,7 +160,7 @@ public class UserAdapterR extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     @Override
                     public void onClick(View v) {
                         if (personListener != null) {
-                            personListener.setPerson(cursor.getString(0), cursor.getInt(1), cursor.getInt(2));
+                            personListener.setPerson(user.getName(), user.getColor(), user.getId());
                         }
                     }
                 });
