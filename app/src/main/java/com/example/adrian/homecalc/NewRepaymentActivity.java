@@ -38,12 +38,12 @@ public class NewRepaymentActivity extends AppCompatActivity implements PersonDia
         userTo = (ImageView) findViewById(R.id.image_user_to);
         nameFrom = (TextView) findViewById(R.id.text_user_from);
         nameTo = (TextView) findViewById(R.id.text_user_to);
-        value = (EditText) findViewById(R.id.value_text);
+        value = (EditText) findViewById(R.id.expense_value_text);
         TextDrawable drawable = TextDrawable.builder()
                 .buildRound("+", R.color.cardview_dark_background);
         userFrom.setImageDrawable(drawable);
         userTo.setImageDrawable(drawable);
-        Button button = (Button) findViewById(R.id.operation_button);
+        Button button = (Button) findViewById(R.id.expense_operation_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -24,7 +24,7 @@ public class NumbersFragment extends DialogFragment {
     private boolean pointer, marker;
     private byte countAfter, countBefore, countIndex;
 
-    interface ValueListener{
+    public interface ValueListener{
         void setValue(String text);
     }
 

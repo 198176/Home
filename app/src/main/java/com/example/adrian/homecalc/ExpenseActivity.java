@@ -69,15 +69,15 @@ public class ExpenseActivity extends AppCompatActivity implements NumbersFragmen
         manager = getSupportFragmentManager();
         SQLiteOpenHelper helper = new ApplicationDatabase(this);
         db = helper.getWritableDatabase();
-        valueText = (EditText) findViewById(R.id.value);
-        titleText = (EditText) findViewById(R.id.title);
-        categoryText = (EditText) findViewById(R.id.category);
-        dateText = (EditText) findViewById(R.id.date);
-        imageUser = (ImageView) findViewById(R.id.user_value);
-        balance = (TextView) findViewById(R.id.balance);
-        Button button = (Button) findViewById(R.id.operation_button);
+        valueText = (EditText) findViewById(R.id.expense_value);
+        titleText = (EditText) findViewById(R.id.expense_title);
+        categoryText = (EditText) findViewById(R.id.expense_category);
+        dateText = (EditText) findViewById(R.id.expense_date);
+        imageUser = (ImageView) findViewById(R.id.expense_value_user);
+        balance = (TextView) findViewById(R.id.expense_balance);
+        Button button = (Button) findViewById(R.id.expense_operation_button);
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        RecyclerView participant = (RecyclerView) findViewById(R.id.participant);
+        RecyclerView participant = (RecyclerView) findViewById(R.id.expense_participant);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         participant.setLayoutManager(layoutManager);
 

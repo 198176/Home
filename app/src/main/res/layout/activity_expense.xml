@@ -8,7 +8,7 @@
     tools:context="com.example.adrian.homecalc.OperationActivity">
 
 <android.support.constraint.ConstraintLayout
-    android:id="@+id/container"
+    android:id="@+id/expense_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:focusable="true"
@@ -16,7 +16,7 @@
     android:padding="@dimen/fab_margin">
 
     <TextView
-        android:id="@+id/value_text"
+        android:id="@+id/expense_value_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,21 +24,21 @@
         android:text="@string/value" />
 
         <ImageView
-            android:id="@+id/user_value"
+            android:id="@+id/expense_value_user"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="@dimen/fab_margin"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/barrier"
-            app:layout_constraintTop_toBottomOf="@id/value_text"
-            app:layout_constraintBottom_toBottomOf="@id/value" />
+            app:layout_constraintEnd_toEndOf="@id/expense_barrier"
+            app:layout_constraintTop_toBottomOf="@id/expense_value_text"
+            app:layout_constraintBottom_toBottomOf="@id/expense_value" />
 
         <EditText
-            android:id="@+id/value"
+            android:id="@+id/expense_value"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/value_text"
-            app:layout_constraintStart_toEndOf="@id/barrier"
+            app:layout_constraintTop_toBottomOf="@id/expense_value_text"
+            app:layout_constraintStart_toEndOf="@id/expense_barrier"
             app:layout_constraintEnd_toEndOf="parent"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="0,00 zł"
@@ -47,139 +47,139 @@
             android:focusableInTouchMode="false" />
 
     <TextView
-        android:id="@+id/title_text"
+        android:id="@+id/expense_title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/value"
+        app:layout_constraintTop_toBottomOf="@id/expense_value"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="@dimen/fab_margin"
         android:layout_marginTop="@dimen/fab_margin"
         android:text="Tytuł" />
 
     <ImageView
-        android:id="@+id/title_image"
+        android:id="@+id/expense_title_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/user_value"
-        app:layout_constraintTop_toBottomOf="@id/title_text"
-        app:layout_constraintBottom_toBottomOf="@id/title"
+        app:layout_constraintEnd_toEndOf="@id/expense_value_user"
+        app:layout_constraintTop_toBottomOf="@id/expense_title_text"
+        app:layout_constraintBottom_toBottomOf="@id/expense_title"
         android:src="@drawable/ic_title"/>
 
     <EditText
-        android:id="@+id/title"
+        android:id="@+id/expense_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/title_text"
-        app:layout_constraintStart_toEndOf="@id/barrier"
+        app:layout_constraintTop_toBottomOf="@id/expense_title_text"
+        app:layout_constraintStart_toEndOf="@id/expense_barrier"
         app:layout_constraintEnd_toEndOf="parent"
         android:hint="Tytuł"
         android:inputType="textCapSentences"
         android:imeOptions="actionDone"/>
 
     <TextView
-        android:id="@+id/category_text"
+        android:id="@+id/expense_category_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/fab_margin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintTop_toBottomOf="@id/expense_title"
         android:layout_marginTop="@dimen/fab_margin"
         android:text="Kategoria" />
 
     <ImageView
-        android:id="@+id/category_image"
+        android:id="@+id/expense_category_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/user_value"
-        app:layout_constraintTop_toBottomOf="@id/category_text"
-        app:layout_constraintBottom_toBottomOf="@id/category"
+        app:layout_constraintEnd_toEndOf="@id/expense_value_user"
+        app:layout_constraintTop_toBottomOf="@id/expense_category_text"
+        app:layout_constraintBottom_toBottomOf="@id/expense_category"
         android:src="@drawable/ic_style_category"/>
 
     <EditText
-        android:id="@+id/category"
+        android:id="@+id/expense_category"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/barrier"
+        app:layout_constraintStart_toEndOf="@id/expense_barrier"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/category_text"
+        app:layout_constraintTop_toBottomOf="@id/expense_category_text"
         android:hint="Kategoria"
         android:cursorVisible="false"
         android:focusable="false"
         android:focusableInTouchMode="false"/>
 
     <TextView
-        android:id="@+id/date_text"
+        android:id="@+id/expense_date_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/fab_margin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/category"
+        app:layout_constraintTop_toBottomOf="@id/expense_category"
         android:layout_marginTop="@dimen/fab_margin"
         android:text="Data" />
 
     <ImageView
-        android:id="@+id/date_image"
+        android:id="@+id/expense_date_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/user_value"
-        app:layout_constraintTop_toBottomOf="@id/date_text"
-        app:layout_constraintBottom_toBottomOf="@id/date"
+        app:layout_constraintEnd_toEndOf="@id/expense_value_user"
+        app:layout_constraintTop_toBottomOf="@id/expense_date_text"
+        app:layout_constraintBottom_toBottomOf="@id/expense_date"
         android:src="@drawable/ic_date"/>
 
     <EditText
-        android:id="@+id/date"
+        android:id="@+id/expense_date"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/date_text"
+        app:layout_constraintTop_toBottomOf="@id/expense_date_text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/barrier"
+        app:layout_constraintStart_toEndOf="@id/expense_barrier"
         android:layout_marginBottom="@dimen/fab_margin"
         android:cursorVisible="false"
         android:focusable="false"
         android:focusableInTouchMode="false"/>
 
     <TextView
-        android:id="@+id/members_text"
+        android:id="@+id/expense_members_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/fab_margin"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/date"
+        app:layout_constraintTop_toBottomOf="@id/expense_date"
         android:layout_marginTop="@dimen/fab_margin"
         android:text="Uczestnicy" />
 
         <TextView
-            android:id="@+id/balance_text"
+            android:id="@+id/expense_balance_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/members_text"
-            app:layout_constraintEnd_toStartOf="@id/balance"
+            app:layout_constraintTop_toTopOf="@id/expense_members_text"
+            app:layout_constraintEnd_toStartOf="@id/expense_balance"
             android:layout_marginEnd="@dimen/fab_margin"
             android:text="Bilans:" />
         <TextView
-            android:id="@+id/balance"
+            android:id="@+id/expense_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="@id/members_text"
+            app:layout_constraintTop_toTopOf="@id/expense_members_text"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="@dimen/fab_margin"
             android:text="0,00 zł"/>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/participant"
+        android:id="@+id/expense_participant"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/members_text"/>
+        app:layout_constraintTop_toBottomOf="@id/expense_members_text"/>
 
     <Button
-        android:id="@+id/operation_button"
+        android:id="@+id/expense_operation_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/participant"
+        app:layout_constraintTop_toBottomOf="@id/expense_participant"
         app:layout_constraintEnd_toEndOf="parent"
         android:background="@drawable/custom_button"
         android:textColor="#FFFFFF"
@@ -188,11 +188,11 @@
         android:text="OK"/>
 
     <android.support.constraint.Barrier
-        android:id="@+id/barrier"
+        android:id="@+id/expense_barrier"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="start"
-        app:constraint_referenced_ids="value, title, category, date"/>
+        app:constraint_referenced_ids="expense_value, expense_title, expense_category, expense_date" />
 </android.support.constraint.ConstraintLayout>
 
 

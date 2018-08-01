@@ -42,6 +42,10 @@
             android:label="@string/title_activity_operation"
             android:parentActivityName=".MainActivity" />
         <activity
+            android:name=".sampledata.ExpenseSplitterActivity"
+            android:label="@string/title_activity_operation"
+            android:parentActivityName=".MainActivity" />
+        <activity
             android:name=".NewRepaymentActivity"
             android:label="Nowa spłata"/>
     </application>

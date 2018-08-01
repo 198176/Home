@@ -46,7 +46,7 @@
         android:text="Komu?"/>
 
     <TextView
-        android:id="@+id/value"
+        android:id="@+id/expense_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/image_user_to"
@@ -56,7 +56,7 @@
         android:text="@string/value"/>
 
     <EditText
-        android:id="@+id/value_text"
+        android:id="@+id/expense_value_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
@@ -64,11 +64,11 @@
         android:cursorVisible="false"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:layout_below="@id/value"
+        android:layout_below="@id/expense_value"
         android:layout_centerHorizontal="true"/>
 
     <Button
-        android:id="@+id/operation_button"
+        android:id="@+id/expense_operation_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

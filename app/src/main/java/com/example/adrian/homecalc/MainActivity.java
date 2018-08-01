@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
+import com.example.adrian.homecalc.sampledata.ExpenseSplitterActivity;
 
 import java.util.List;
 
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = (ViewPager) findViewById(R.id.expense_container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -169,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
             @Override
             public void onClick(View v) {
                 clickFab();
-                Intent intent = new Intent(MainActivity.this, ExpenseActivity.class);
+                Intent intent = new Intent(MainActivity.this, ExpenseSplitterActivity.class);
                 startActivityForResult(intent, 0);
             }
         });

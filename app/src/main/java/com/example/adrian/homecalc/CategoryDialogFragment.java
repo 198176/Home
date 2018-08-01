@@ -25,7 +25,7 @@ import android.widget.Toast;
  */
 public class CategoryDialogFragment extends DialogFragment {
 
-    interface CategoryListener{
+    public interface CategoryListener{
         void setCategory(String text, int ids);
     }
 

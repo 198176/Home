@@ -81,7 +81,7 @@ public class PersonDialogFragment extends DialogFragment {
         this.listener = (PersonDialogFragment.PersonListener) activity;
     }
 
-    interface PersonListener {
+    public interface PersonListener {
         void setPerson(String text, int color, int ids);
     }
 

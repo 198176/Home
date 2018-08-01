@@ -75,7 +75,7 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
         titleText = (EditText) findViewById(R.id.operation_title);
         dateText = (EditText) findViewById(R.id.operation_date);
         radioGroup = (RadioGroup) findViewById(R.id.radio_group);
-        Button button = (Button) findViewById(R.id.operation_button);
+        Button button = (Button) findViewById(R.id.expense_operation_button);
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         try {
