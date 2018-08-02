@@ -107,6 +107,11 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        try {
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+        }
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
