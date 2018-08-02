@@ -65,7 +65,7 @@ public abstract class PaymentDBUtils {
             @Override
             public void run() {
                 long[] id = MyApplication.getHomeRoomDatabase().paymentDao().insert(payment);
-                for (Participant participant : payment.getParticipants()){
+                for (Participant participant : payment.getParticipants()) {
                     participant.setPayment_id(id[0]);
                     MyApplication.getHomeRoomDatabase().participantDao().insert(participant);
                 }

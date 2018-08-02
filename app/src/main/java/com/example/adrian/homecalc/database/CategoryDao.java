@@ -16,6 +16,9 @@ public interface CategoryDao {
     @Query("SELECT * FROM Categories")
     List<Category> getAll();
 
+    @Query("SELECT * FROM Categories WHERE id = :id")
+    Category getCategoryById(int id);
+
     @Query("SELECT * FROM CATEGORIES WHERE DEFAULTS = 1")
     Category getDefaultCategory();
 

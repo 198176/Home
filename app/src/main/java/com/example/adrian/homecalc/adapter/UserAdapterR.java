@@ -31,11 +31,13 @@ public class UserAdapterR extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private int flag = 0;
     private ArrayList<User> users;
 
-    public UserAdapterR() {}
+    public UserAdapterR(Context context) {
+        this.context = context;
+    }
 
     public UserAdapterR(Cursor cursor, boolean flag) {
         this.cursor = cursor;
-        if(flag) this.flag = 1;
+        if (flag) this.flag = 1;
     }
 
     public UserAdapterR(Context context, Cursor cursor, SparseArray<String> sparseArray) {
@@ -44,7 +46,7 @@ public class UserAdapterR extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.sparseArray = sparseArray;
     }
 
-    public void setUsers(ArrayList<User> users, SparseArray<String> sparseArray){
+    public void setUsers(ArrayList<User> users, SparseArray<String> sparseArray) {
         this.users = users;
         this.sparseArray = sparseArray;
     }
@@ -84,7 +86,7 @@ public class UserAdapterR extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        if(users != null) return users.size() + flag;
+        if (users != null) return users.size() + flag;
         return 0;
     }
 

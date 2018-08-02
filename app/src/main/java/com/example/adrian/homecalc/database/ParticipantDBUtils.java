@@ -5,15 +5,6 @@ import com.example.adrian.homecalc.model.Participant;
 
 public abstract class ParticipantDBUtils {
 
-    public static void getAll(final DBCallback<Participant> callback) {
-        new Thread(new Runnable() {
-            @Override
-            public synchronized void run() {
-                callback.onCallback(MyApplication.getHomeRoomDatabase().participantDao().getAll());
-            }
-        }).start();
-    }
-
     public static void delete(final Participant participant) {
         new Thread(new Runnable() {
             @Override

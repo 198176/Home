@@ -1,10 +1,14 @@
 package com.example.adrian.homecalc.model;
 
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
-@Entity(tableName = "Participants")
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+@Entity(tableName = "Participants", foreignKeys = @ForeignKey(entity =  Payment.class,
+        parentColumns = "id", childColumns = "payment_id", onDelete = CASCADE))
 public class Participant {
 
     @PrimaryKey(autoGenerate = true)

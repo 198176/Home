@@ -3,9 +3,7 @@ package com.example.adrian.homecalc;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.adrian.homecalc.database.DBCallbackCursor;
 import com.example.adrian.homecalc.database.PaymentDBUtils;
+import com.example.adrian.homecalc.sampledata.ExpenseSplitterActivity;
 
 
 /**
@@ -26,12 +25,9 @@ import com.example.adrian.homecalc.database.PaymentDBUtils;
 public class ListOperationFragment extends Fragment {
 
 
+    ListOperationAdapter adapter;
     private Cursor cursor;
     private RecyclerView view;
-    private Toast toast;
-    private Bundle bundle;
-    ListOperationAdapter adapter;
-
     DBCallbackCursor callbackCursor = new DBCallbackCursor() {
         @Override
         public void onCallback(Cursor callCursor) {
@@ -45,6 +41,8 @@ public class ListOperationFragment extends Fragment {
             });
         }
     };
+    private Toast toast;
+    private Bundle bundle;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,10 +55,7 @@ public class ListOperationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = (RecyclerView) inflater.inflate(R.layout.dialog_category, container, false);
-//        adapter = new ListOperationAdapter(cursor);
-//        view.setAdapter(adapter);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        view.setLayoutManager(layoutManager);
+        view.setLayoutManager(new LinearLayoutManager(getActivity()));
         adapter = new ListOperationAdapter();
         adapter.setOperationListener(new ListOperationAdapter.OperationListener() {
             @Override
@@ -69,7 +64,7 @@ public class ListOperationFragment extends Fragment {
                 if (isPlus) {
                     intent.setClass(getActivity(), OperationActivity.class);
                 } else {
-                    intent.setClass(getActivity(), ExpenseActivity.class);
+                    intent.setClass(getActivity(), ExpenseSplitterActivity.class);
                 }
                 intent.putExtra(OperationActivity.EDIT, id);
                 startActivityForResult(intent, 0);
@@ -84,43 +79,19 @@ public class ListOperationFragment extends Fragment {
         super.onStart();
         try {
             if (bundle != null) {
-                if(bundle.containsKey("planned") && bundle.getBoolean("planned")) {
+                if (bundle.containsKey("planned") && bundle.getBoolean("planned")) {
                     PaymentDBUtils.getAllPlannedPayments(callbackCursor);
                 }
             } else {
-                if(MainActivity.person_id == -1){
+                if (MainActivity.person_id == -1) {
                     PaymentDBUtils.getAllPaymentsWhereDateForAllUsers(callbackCursor, MainActivity.dayBilling, MainActivity.getSpinnerDate());
                 } else {
                     PaymentDBUtils.getAllPaymentsWhereDateAndUser(callbackCursor, MainActivity.dayBilling, MainActivity.getSpinnerDate(), MainActivity.person_id);
                 }
-//                cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), strftime('%Y-%m-%d', " +
-//                        "date(DATE/1000, 'unixepoch', 'localtime')), CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, " +
-//                        "PAYMENT.ID_PAY, (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) < strftime("+MainActivity.dayBilling+") " +
-//                        "THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) ELSE " +
-//                        "strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH FROM PAYMENT, " +
-//                        "CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND MONTH = '" + MainActivity.getSpinnerDate() +
-//                        "' AND " + MainActivity.getPayingId() + " DATE/1000 <= cast(strftime('%s', 'now') as integer) " +
-//                        "GROUP BY PAYMENT.ID_PAY ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
             }
         } catch (SQLiteException w) {
             toast.show();
         }
-
-//        ListOperationAdapter adapter = new ListOperationAdapter(cursor);
-//        adapter.setOperationListener(new ListOperationAdapter.OperationListener() {
-//            @Override
-//            public void editOperation(int id, boolean isPlus) {
-//                Intent intent = new Intent();
-//                if (isPlus) {
-//                    intent.setClass(getActivity(), OperationActivity.class);
-//                } else {
-//                    intent.setClass(getActivity(), ExpenseActivity.class);
-//                }
-//                intent.putExtra(OperationActivity.EDIT, id);
-//                startActivityForResult(intent, 0);
-//            }
-//        });
-//        view.setAdapter(adapter);
     }
 
     @Override

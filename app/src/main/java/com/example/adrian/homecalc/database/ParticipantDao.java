@@ -13,8 +13,8 @@ import java.util.List;
 @Dao
 public interface ParticipantDao {
 
-    @Query("SELECT * FROM Participants")
-    List<Participant> getAll();
+    @Query("SELECT * FROM Participants WHERE payment_id = :id")
+    List<Participant> getAllById(int id);
 
     @Insert
     void insert(Participant... payments);

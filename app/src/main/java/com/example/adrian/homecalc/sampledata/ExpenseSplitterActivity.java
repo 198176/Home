@@ -2,7 +2,6 @@ package com.example.adrian.homecalc.sampledata;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -94,7 +93,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
     private int idEdit = -1;
     private int place = -1;
     private Toast toast;
-    private Cursor cursorParticipant;
+    private Payment payment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +107,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
         participant.setLayoutManager(new LinearLayoutManager(this));
 
         if (idEdit != -1) {
-            //editFields();
+            editFields();
         } else {
             setPaying(1);
             updateDate();
@@ -161,7 +160,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
         });
 
         try {
-            userAdapter = new UserAdapterR();
+            userAdapter = new UserAdapterR(this);
             UserDBUtils.getAll(userDBCallback);
             participant.setAdapter(userAdapter);
             userAdapter.setUserListener(new UserAdapterR.UserListener() {
@@ -292,13 +291,11 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
 
     private void createOperations() {
         String title = titleText.getText().toString();
-        //int id = getId() + 1;
         if (title.length() == 0) {
             title = titleText.getHint().toString();
         }
         if (idEdit != -1) {
-            //db.delete(ApplicationDatabase.PAYMENT, "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
-            //id = idEdit;
+            PaymentDBUtils.delete(payment);
         }
         try {
             ArrayList<Participant> participants = new ArrayList<>();
@@ -321,33 +318,41 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
         setResult(RESULT_OK, getSupportParentActivityIntent());
     }
 
-    private int getId() {
-        return MyApplication.getHomeRoomDatabase().paymentDao().getLastId();
-    }
-
-//    private void editFields() {
-//        setTitle(R.string.editing_operations);
-//        try {
-//            Cursor cursor = db.rawQuery("SELECT P.TITLE, P.VALUE, strftime('%Y-%m-%d', datetime(DATE/1000, 'unixepoch', 'localtime')), " +
-//                    "P.CATEGORY_ID, P.PERSON_ID, C.NAME, P.PAYING_ID FROM PAYMENT AS P, CATEGORY AS C " +
-//                    "WHERE P.CATEGORY_ID = C._id AND P.ID_PAY = " + idEdit, null);
-//            cursor.moveToFirst();
-//            titleText.setText(cursor.getString(0));
-//            categoryText.setText(cursor.getString(5));
-//            idCategory = cursor.getInt(3);
-//            dateText.setText(cursor.getString(2));
-//            setPaying(cursor.getInt(6));
-//            double cursorValue = 0;
-//            do {
-//                cursorValue += Math.abs(cursor.getDouble(1));
-//                sparseArray.put(cursor.getInt(4), replaceDoubleToString(Math.abs(cursor.getDouble(1))));
-//            } while (cursor.moveToNext());
-//            valueText.setText(replaceDoubleToString(cursorValue));
-//            cursor.close();
-//        } catch (SQLiteException w) {
-//            toast.show();
-//        }
+//    private int getId() {
+//        return MyApplication.getHomeRoomDatabase().paymentDao().getLastId();
 //    }
+
+    private void editFields() {
+        setTitle(R.string.editing_operations);
+        try {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    payment = MyApplication.getHomeRoomDatabase().paymentDao().getPaymentById(idEdit);
+                    payment.setParticipants((ArrayList<Participant>) MyApplication.getHomeRoomDatabase().participantDao().getAllById(payment.getId()));
+                    final Category category = MyApplication.getHomeRoomDatabase().categoryDao().getCategoryById(payment.getCategory_id());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            titleText.setText(payment.getTitle());
+                            categoryText.setText(category.getName());
+                            idCategory = payment.getCategory_id();
+                            dateTime.setTimeInMillis(payment.getDate());
+                            valueText.setText(replaceDoubleToString(Math.abs(payment.getValue())));
+                            updateDate();
+                            setPaying(payment.getPaying_id());
+                            for (Participant participant : payment.getParticipants()) {
+                                sparseArray.put(participant.getUser_id(), replaceDoubleToString(Math.abs(participant.getUser_value())));
+                            }
+                            userAdapter.notifyDataSetChanged();
+                        }
+                    });
+                }
+            }).start();
+        } catch (SQLiteException w) {
+            toast.show();
+        }
+    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         if (idEdit != -1) {
@@ -377,7 +382,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
     }
 
     private void deleteOperation() {
-        //db.delete(ApplicationDatabase.PAYMENT, "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
+        PaymentDBUtils.delete(payment);
         finish();
         setResult(RESULT_OK, getSupportParentActivityIntent());
     }
@@ -385,7 +390,6 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //cursorParticipant.close();
         unbinder.unbind();
     }
 }
