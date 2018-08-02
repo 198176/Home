@@ -15,7 +15,7 @@ import android.widget.TextView;
  * Created by Adrian on 2017-08-26.
  */
 
-public class ListOperationAdapter extends RecyclerView.Adapter<ListOperationAdapter.ViewHolder> {
+public class ListOperationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Cursor cursor;
     private OperationListener listener;
@@ -25,45 +25,14 @@ public class ListOperationAdapter extends RecyclerView.Adapter<ListOperationAdap
     }
 
     @Override
-    public ListOperationAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        CardView cv = (CardView) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_list_operation, parent, false);
-        return new ViewHolder(cv);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new OperationViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.fragment_list_operation, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(ListOperationAdapter.ViewHolder holder, final int position) {
-        String mark = "";
-        CardView cardView = holder.cardView;
-        cursor.moveToPosition(position);
-        TextView title = (TextView) cardView.findViewById(R.id.title_operation);
-        title.setText(cursor.getString(0));
-        TextView value = (TextView) cardView.findViewById(R.id.value_operation);
-        if (cursor.getDouble(1) < 0) {
-            value.setTextColor(0xFFD50000);
-        } else {
-            mark = "+";
-            value.setTextColor(0xFF2E7D32);
-        }
-        value.setText(mark + String.format("%.2f zł", cursor.getDouble(1)));
-        TextView date = (TextView) cardView.findViewById(R.id.date_operation);
-        date.setText(cursor.getString(2));
-        TextView category = (TextView) cardView.findViewById(R.id.category_operation);
-        category.setText(cursor.getString(3));
-        FloatingActionButton floating = (FloatingActionButton) cardView.findViewById(R.id.floatingCategory);
-        Drawable drawable = cardView.getResources().getDrawable(cursor.getInt(5));
-        floating.setBackgroundTintList(ColorStateList.valueOf(cursor.getInt(4)));
-        floating.setImageDrawable(drawable);
-        cardView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                if (listener != null) {
-                    cursor.moveToPosition(position);
-                    listener.editOperation(cursor.getInt(6), (cursor.getDouble(1) > 0));
-                }
-                return false;
-            }
-        });
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+        ((OperationViewHolder)holder).bind(position);
     }
 
     @Override
@@ -79,12 +48,51 @@ public class ListOperationAdapter extends RecyclerView.Adapter<ListOperationAdap
         void editOperation(int id, boolean isPlus);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        private CardView cardView;
+    public class OperationViewHolder extends RecyclerView.ViewHolder {
 
-        public ViewHolder(CardView v) {
+        View parent;
+        TextView title;
+        TextView value;
+        TextView date;
+        TextView category;
+        FloatingActionButton floating;
+
+        public OperationViewHolder(View v) {
             super(v);
-            cardView = v;
+            parent = v;
+            title = v.findViewById(R.id.title_operation);
+            value = v.findViewById(R.id.value_operation);
+            date = v.findViewById(R.id.date_operation);
+            category = v.findViewById(R.id.category_operation);
+            floating = v.findViewById(R.id.floatingCategory);
+        }
+
+        void bind(final int position){
+            String mark = "";
+            cursor.moveToPosition(position);
+            title.setText(cursor.getString(cursor.getColumnIndex("title")));
+            if (cursor.getDouble(cursor.getColumnIndex("value")) < 0) {
+                value.setTextColor(0xFFD50000);
+            } else {
+                mark = "+";
+                value.setTextColor(0xFF2E7D32);
+            }
+            value.setText(mark + String.format("%.2f zł", cursor.getDouble(cursor.getColumnIndex("value"))));
+            date.setText(cursor.getString(cursor.getColumnIndex("date")));
+            category.setText(cursor.getString(cursor.getColumnIndex("name")));
+            Drawable drawable = parent.getResources().getDrawable(cursor.getInt(cursor.getColumnIndex("icon")));
+            floating.setBackgroundTintList(ColorStateList.valueOf(cursor.getInt(cursor.getColumnIndex("color"))));
+            floating.setImageDrawable(drawable);
+            parent.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    if (listener != null) {
+                        cursor.moveToPosition(position);
+                        listener.editOperation(cursor.getInt(cursor.getColumnIndex("id")), (cursor.getDouble(cursor.getColumnIndex("value")) > 0));
+                    }
+                    return false;
+                }
+            });
         }
     }
 

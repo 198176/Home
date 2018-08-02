@@ -24,18 +24,18 @@ public interface PaymentDao {
     @Query("SELECT id FROM Payments WHERE id = ( SELECT MAX(id) FROM Payments)")
     int getLastId();
 
-    @Query("SELECT title, value , strftime('%Y-%m-%d', date(DATE/1000, 'unixepoch', 'localtime')), name, color, icon " +
+    @Query("SELECT title, value , strftime('%Y-%m-%d', date(DATE/1000, 'unixepoch', 'localtime')) date, name, color, icon, Payments.id " +
             "FROM Payments, Categories WHERE Payments.category_id = Categories.id AND PAYING_ID = :payingId AND " +
             DATE_BY_BILLING + " = :date AND DATE/1000 <= cast(strftime('%s', 'now') as integer) " +
             "ORDER BY Payments.DATE DESC, Payments.id DESC")
     Cursor getAllPaymentsWhereDateAndUser(int dayBilling, String date, int payingId);
 
-    @Query("SELECT title, value , strftime('%Y-%m-%d', date(DATE/1000, 'unixepoch', 'localtime')), name, color, icon " +
+    @Query("SELECT title, value , strftime('%Y-%m-%d', date(DATE/1000, 'unixepoch', 'localtime')) date, name, color, icon, Payments.id " +
             "FROM Payments, Categories WHERE Payments.category_id = Categories.id AND " + DATE_BY_BILLING +
             " = :date AND DATE/1000 <= cast(strftime('%s', 'now') as integer) ORDER BY Payments.DATE DESC, Payments.id DESC")
     Cursor getAllPaymentsWhereDateForAllUsers (int dayBilling, String date);
 
-    @Query("SELECT title, value, strftime('%Y-%m-%d', date(DATE/1000, 'unixepoch', 'localtime')), name, color, icon " +
+    @Query("SELECT title, value, strftime('%Y-%m-%d', date(DATE/1000, 'unixepoch', 'localtime')) date, name, color, icon, Payments.id " +
             "FROM Payments, Categories WHERE Payments.category_id = Categories.id AND DATE/1000 > " +
             "cast(strftime('%s', 'now') as integer) ORDER BY date ASC, Payments.id DESC")
     Cursor getAllPlannedPayments();
