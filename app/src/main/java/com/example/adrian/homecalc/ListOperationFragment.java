@@ -16,6 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.adrian.homecalc.database.DBCallbackCursor;
+import com.example.adrian.homecalc.database.PaymentDBUtils;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -23,30 +26,31 @@ import android.widget.Toast;
 public class ListOperationFragment extends Fragment {
 
 
-    private SQLiteDatabase db;
     private Cursor cursor;
     private RecyclerView view;
     private Toast toast;
     private Bundle bundle;
+    ListOperationAdapter adapter;
 
-    public ListOperationFragment() {
-        // Required empty public constructor
-    }
+    DBCallbackCursor callbackCursor = new DBCallbackCursor() {
+        @Override
+        public void onCallback(Cursor callCursor) {
+            cursor = callCursor;
+            view.post(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.setCursor(cursor);
+                    adapter.notifyDataSetChanged();
+                }
+            });
+        }
+    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bundle = getArguments();
         toast = Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT);
-        try {
-            SQLiteOpenHelper helper = new ApplicationDatabase(getActivity());
-            db = helper.getReadableDatabase();
-//            cursor = db.rawQuery("SELECT PAYMENT.TITLE, PAYMENT.VALUE, PAYMENT.DATE, "+
-//                            "CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID FROM PAYMENT, CATEGORY "+
-//                            "WHERE PAYMENT.CATEGORY_ID=CATEGORY._id",null);
-        } catch (SQLiteException w) {
-            toast.show();
-        }
     }
 
     @Override
@@ -57,36 +61,7 @@ public class ListOperationFragment extends Fragment {
 //        view.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         view.setLayoutManager(layoutManager);
-        return view;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        try {
-            if (bundle != null) {
-                if(bundle.containsKey("planned") && bundle.getBoolean("planned")) {
-                    cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), strftime('%Y-%m-%d', " +
-                            "date(DATE/1000, 'unixepoch', 'localtime')), CATEGORY.NAME, CATEGORY.COLOR, " +
-                            "CATEGORY.ICON_ID, PAYMENT.ID_PAY FROM PAYMENT, CATEGORY WHERE PAYMENT.CATEGORY_ID " +
-                            "= CATEGORY._id AND DATE/1000 > cast(strftime('%s', 'now') as integer) " +
-                            "GROUP BY PAYMENT.ID_PAY ORDER BY PAYMENT.DATE ASC, PAYMENT._id DESC", null);
-                }
-            } else {
-                cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), strftime('%Y-%m-%d', " +
-                        "date(DATE/1000, 'unixepoch', 'localtime')), CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, " +
-                        "PAYMENT.ID_PAY, (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) < strftime("+MainActivity.dayBilling+") " +
-                        "THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) ELSE " +
-                        "strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH FROM PAYMENT, " +
-                        "CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND MONTH = '" + MainActivity.getSpinnerDate() +
-                        "' AND " + MainActivity.getPayingId() + " DATE/1000 <= cast(strftime('%s', 'now') as integer) " +
-                        "GROUP BY PAYMENT.ID_PAY ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
-            }
-        } catch (SQLiteException w) {
-            toast.show();
-        }
-
-        ListOperationAdapter adapter = new ListOperationAdapter(cursor);
+        adapter = new ListOperationAdapter();
         adapter.setOperationListener(new ListOperationAdapter.OperationListener() {
             @Override
             public void editOperation(int id, boolean isPlus) {
@@ -101,13 +76,57 @@ public class ListOperationFragment extends Fragment {
             }
         });
         view.setAdapter(adapter);
+        return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        try {
+            if (bundle != null) {
+                if(bundle.containsKey("planned") && bundle.getBoolean("planned")) {
+                    PaymentDBUtils.getAllPlannedPayments(callbackCursor);
+                }
+            } else {
+                if(MainActivity.person_id == -1){
+                    PaymentDBUtils.getAllPaymentsWhereDateForAllUsers(callbackCursor, MainActivity.dayBilling, MainActivity.getSpinnerDate());
+                } else {
+                    PaymentDBUtils.getAllPaymentsWhereDateAndUser(callbackCursor, MainActivity.dayBilling, MainActivity.getSpinnerDate(), MainActivity.person_id);
+                }
+//                cursor = db.rawQuery("SELECT PAYMENT.TITLE, SUM(PAYMENT.VALUE), strftime('%Y-%m-%d', " +
+//                        "date(DATE/1000, 'unixepoch', 'localtime')), CATEGORY.NAME, CATEGORY.COLOR, CATEGORY.ICON_ID, " +
+//                        "PAYMENT.ID_PAY, (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) < strftime("+MainActivity.dayBilling+") " +
+//                        "THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) ELSE " +
+//                        "strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH FROM PAYMENT, " +
+//                        "CATEGORY WHERE PAYMENT.CATEGORY_ID=CATEGORY._id AND MONTH = '" + MainActivity.getSpinnerDate() +
+//                        "' AND " + MainActivity.getPayingId() + " DATE/1000 <= cast(strftime('%s', 'now') as integer) " +
+//                        "GROUP BY PAYMENT.ID_PAY ORDER BY PAYMENT.DATE DESC, PAYMENT._id DESC", null);
+            }
+        } catch (SQLiteException w) {
+            toast.show();
+        }
+
+//        ListOperationAdapter adapter = new ListOperationAdapter(cursor);
+//        adapter.setOperationListener(new ListOperationAdapter.OperationListener() {
+//            @Override
+//            public void editOperation(int id, boolean isPlus) {
+//                Intent intent = new Intent();
+//                if (isPlus) {
+//                    intent.setClass(getActivity(), OperationActivity.class);
+//                } else {
+//                    intent.setClass(getActivity(), ExpenseActivity.class);
+//                }
+//                intent.putExtra(OperationActivity.EDIT, id);
+//                startActivityForResult(intent, 0);
+//            }
+//        });
+//        view.setAdapter(adapter);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         cursor.close();
-        db.close();
     }
 
 }

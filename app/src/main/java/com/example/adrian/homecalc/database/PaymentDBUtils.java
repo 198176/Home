@@ -15,6 +15,33 @@ public abstract class PaymentDBUtils {
         }).start();
     }
 
+    public static void getAllPaymentsWhereDateAndUser(final DBCallbackCursor callback, final int dayBilling, final String date, final int payingId) {
+        new Thread(new Runnable() {
+            @Override
+            public synchronized void run() {
+                callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getAllPaymentsWhereDateAndUser(dayBilling, date, payingId));
+            }
+        }).start();
+    }
+
+    public static void getAllPaymentsWhereDateForAllUsers(final DBCallbackCursor callback, final int dayBilling, final String date) {
+        new Thread(new Runnable() {
+            @Override
+            public synchronized void run() {
+                callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getAllPaymentsWhereDateForAllUsers(dayBilling, date));
+            }
+        }).start();
+    }
+
+    public static void getAllPlannedPayments(final DBCallbackCursor callback) {
+        new Thread(new Runnable() {
+            @Override
+            public synchronized void run() {
+                callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getAllPlannedPayments());
+            }
+        }).start();
+    }
+
     public static void delete(final Payment payment) {
         new Thread(new Runnable() {
             @Override

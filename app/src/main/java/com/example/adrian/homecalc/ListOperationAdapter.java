@@ -19,7 +19,8 @@ public class ListOperationAdapter extends RecyclerView.Adapter<ListOperationAdap
 
     private Cursor cursor;
     private OperationListener listener;
-    public ListOperationAdapter(Cursor cursor) {
+
+    void setCursor(Cursor cursor){
         this.cursor = cursor;
     }
 
@@ -67,7 +68,7 @@ public class ListOperationAdapter extends RecyclerView.Adapter<ListOperationAdap
 
     @Override
     public int getItemCount() {
-        return cursor.getCount();
+        return  (cursor == null) ? 0 : cursor.getCount();
     }
 
     public void setOperationListener(OperationListener listener) {

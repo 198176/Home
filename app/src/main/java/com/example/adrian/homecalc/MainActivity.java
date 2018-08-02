@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
         NavigationView.OnNavigationItemSelectedListener {
 
     private static String spinner_date = "";
-    private static int person_id = 1;
+    public static int person_id = 1;
     boolean isOpen = false;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -224,27 +224,55 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
 
     public void setSpinnerDate() {
         try {
-            Cursor cursorDate = db.rawQuery("SELECT _id, (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) " +
-                    "< strftime(" + dayBilling + ") THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) " +
-                    "ELSE strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH FROM PAYMENT " +
-                    "WHERE DATE/1000 <= cast(strftime('%s', 'now') as integer) GROUP BY MONTH ORDER BY MONTH DESC", null);
-            CursorAdapter listAdapter = new SimpleCursorAdapter(this, R.layout.spinner_date,
-                    cursorDate, new String[]{"MONTH"}, new int[]{R.id.spinner_text}, 0);
-            spinner.setAdapter(listAdapter);
-            //spinner_date = String.valueOf(spinner.getContentDescription());
-            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            new Thread(new Runnable() {
                 @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                    Cursor c = (Cursor) parent.getItemAtPosition(pos);
-                    spinner_date = c.getString(c.getColumnIndex("MONTH"));
-                    refreshFragments();
-                }
+                public void run() {
+                    final Cursor cursorDate = MyApplication.getHomeRoomDatabase().paymentDao().getSpinnerDate(dayBilling);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            CursorAdapter listAdapter = new SimpleCursorAdapter(MainActivity.this, R.layout.spinner_date,
+                                    cursorDate, new String[]{"MONTH"}, new int[]{R.id.spinner_text}, 0);
+                            spinner.setAdapter(listAdapter);
+                            //spinner_date = String.valueOf(spinner.getContentDescription());
+                            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                                    Cursor c = (Cursor) parent.getItemAtPosition(pos);
+                                    spinner_date = c.getString(c.getColumnIndex("MONTH"));
+                                    refreshFragments();
+                                }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
+                                @Override
+                                public void onNothingSelected(AdapterView<?> parent) {
 
+                                }
+                            });
+                        }
+                    });
                 }
-            });
+            }).start();
+//            Cursor cursorDate = db.rawQuery("SELECT _id, (CASE WHEN cast(strftime('%d', date(DATE/1000, 'unixepoch', 'localtime')) as integer) " +
+//                    "< strftime(" + dayBilling + ") THEN strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime', '-1 month')) " +
+//                    "ELSE strftime('%Y-%m', date(DATE/1000, 'unixepoch', 'localtime')) END) MONTH FROM PAYMENT " +
+//                    "WHERE DATE/1000 <= cast(strftime('%s', 'now') as integer) GROUP BY MONTH ORDER BY MONTH DESC", null);
+//            CursorAdapter listAdapter = new SimpleCursorAdapter(this, R.layout.spinner_date,
+//                    cursorDate, new String[]{"MONTH"}, new int[]{R.id.spinner_text}, 0);
+//            spinner.setAdapter(listAdapter);
+//            //spinner_date = String.valueOf(spinner.getContentDescription());
+//            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//                @Override
+//                public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+//                    Cursor c = (Cursor) parent.getItemAtPosition(pos);
+//                    spinner_date = c.getString(c.getColumnIndex("MONTH"));
+//                    refreshFragments();
+//                }
+//
+//                @Override
+//                public void onNothingSelected(AdapterView<?> parent) {
+//
+//                }
+//            });
         } catch (SQLiteException w) {
             Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT).show();
         }

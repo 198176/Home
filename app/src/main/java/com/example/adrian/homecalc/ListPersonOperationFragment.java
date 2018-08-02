@@ -59,7 +59,8 @@ public class ListPersonOperationFragment extends Fragment {
             Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
         }
 
-        ListOperationAdapter adapter = new ListOperationAdapter(cursor);
+        ListOperationAdapter adapter = new ListOperationAdapter();
+        adapter.setCursor(cursor);
         view.setAdapter(adapter);
     }
 

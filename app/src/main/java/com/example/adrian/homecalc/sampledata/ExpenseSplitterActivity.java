@@ -312,6 +312,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
                 }
                 participants.add(new Participant(key, number));
             }
+            value *= -1;
             PaymentDBUtils.insert(new Payment(title, value, dateTime.getTimeInMillis(), idCategory, idPaying, participants));
         } catch (SQLiteException w) {
             toast.show();
@@ -384,7 +385,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        cursorParticipant.close();
+        //cursorParticipant.close();
         unbinder.unbind();
     }
 }
