@@ -28,4 +28,5 @@
     <string name="ask_delete_user">Czy na pewno chcesz usunąć użytkownika?</string>
     <string name="income">WPŁYWY</string>
     <string name="expenses">WYDATKI</string>
+    <string name="title_new_repayment">Nowa spłata</string>
 </resources>

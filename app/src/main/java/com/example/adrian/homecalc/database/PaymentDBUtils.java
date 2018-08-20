@@ -15,20 +15,86 @@ public abstract class PaymentDBUtils {
         }).start();
     }
 
-    public static void getAllPaymentsWhereDateAndUser(final DBCallbackCursor callback, final int dayBilling, final String date, final int payingId) {
+    public static void getAllPaymentsByDateAndUser(final DBCallbackCursor callback, final int dayBilling, final String date, final int payingId) {
         new Thread(new Runnable() {
             @Override
             public synchronized void run() {
-                callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getAllPaymentsWhereDateAndUser(dayBilling, date, payingId));
+                callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getAllPaymentsByDateAndUser(dayBilling, date, payingId));
             }
         }).start();
     }
 
-    public static void getAllPaymentsWhereDateForAllUsers(final DBCallbackCursor callback, final int dayBilling, final String date) {
+    public static void getAllPaymentsByDateForAllUsers(final DBCallbackCursor callback, final int dayBilling, final String date) {
         new Thread(new Runnable() {
             @Override
             public synchronized void run() {
-                callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getAllPaymentsWhereDateForAllUsers(dayBilling, date));
+                callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getAllPaymentsByDateForAllUsers(dayBilling, date));
+            }
+        }).start();
+    }
+
+    public static void getAllParticipantPaymentByUser(final DBCallbackCursor callback, final int dayBilling, final String date, final int payingId) {
+        new Thread(new Runnable() {
+            @Override
+            public synchronized void run() {
+                callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getAllParticipantPaymentByUser(dayBilling, date, payingId));
+            }
+        }).start();
+    }
+
+    public static void getAllParticipantPaymentForAllUsers(final DBCallbackCursor callback, final int dayBilling, final String date) {
+        new Thread(new Runnable() {
+            @Override
+            public synchronized void run() {
+                callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getAllParticipantPaymentForAllUsers(dayBilling, date));
+            }
+        }).start();
+    }
+
+    public static void getPositiveSummaryPaymentsCategories(final DBCallbackCursor callback, final int dayBilling, final String date, final int payingId) {
+        new Thread(new Runnable() {
+            @Override
+            public synchronized void run() {
+                if (payingId == -1) {
+                    callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao()
+                            .getPositiveSummaryPaymentsCategoriesForAllUsers(dayBilling, date));
+                } else {
+                    callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao()
+                            .getPositiveSummaryPaymentsCategoriesByUser(dayBilling, date, payingId));
+                }
+            }
+        }).start();
+    }
+
+    public static void getNegativeSummaryPaymentsCategories(final DBCallbackCursor callback, final int dayBilling, final String date, final int payingId) {
+        new Thread(new Runnable() {
+            @Override
+            public synchronized void run() {
+                if (payingId == -1) {
+                    callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao()
+                            .getNegativeSummaryPaymentsCategoriesForAllUsers(dayBilling, date));
+                } else {
+                    callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao()
+                            .getNegativeSummaryPaymentsCategoriesByUser(dayBilling, date, payingId));
+                }
+            }
+        }).start();
+    }
+
+    public static void getArrearsUsers(final DBCallbackCursor callback){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getArrearsUsers());
+            }
+        }).start();
+    }
+
+    public static void getRepaymentsUsers(final DBCallbackCursor callback){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getRepaymentsUsers());
             }
         }).start();
     }
@@ -38,6 +104,16 @@ public abstract class PaymentDBUtils {
             @Override
             public synchronized void run() {
                 callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao().getAllPlannedPayments());
+            }
+        }).start();
+    }
+
+    public static void updatePaymentsCategoryIdByCategory(final int id){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int default_id = MyApplication.getHomeRoomDatabase().categoryDao().getDefaultCategory().getId();
+                MyApplication.getHomeRoomDatabase().paymentDao().updatePaymentsCategoryIdByCategory(default_id, id);
             }
         }).start();
     }

@@ -1,4 +1,4 @@
-package com.example.adrian.homecalc.sampledata;
+package com.example.adrian.homecalc.activity;
 
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
@@ -21,13 +21,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
-import com.example.adrian.homecalc.CategoryDialogFragment;
+import com.example.adrian.homecalc.dialog.CategoryDialogFragment;
 import com.example.adrian.homecalc.MyApplication;
-import com.example.adrian.homecalc.NumbersFragment;
-import com.example.adrian.homecalc.OperationActivity;
-import com.example.adrian.homecalc.PersonDialogFragment;
+import com.example.adrian.homecalc.dialog.NumbersFragment;
+import com.example.adrian.homecalc.dialog.PersonDialogFragment;
 import com.example.adrian.homecalc.R;
-import com.example.adrian.homecalc.adapter.UserAdapterR;
+import com.example.adrian.homecalc.adapter.UserAdapter;
 import com.example.adrian.homecalc.database.DBCallback;
 import com.example.adrian.homecalc.database.PaymentDBUtils;
 import com.example.adrian.homecalc.database.UserDBUtils;
@@ -45,8 +44,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.example.adrian.homecalc.OperationActivity.replaceDoubleToString;
-import static com.example.adrian.homecalc.OperationActivity.replaceStringToDouble;
+import static com.example.adrian.homecalc.activity.OperationActivity.replaceDoubleToString;
+import static com.example.adrian.homecalc.activity.OperationActivity.replaceStringToDouble;
 
 public class ExpenseSplitterActivity extends AppCompatActivity implements NumbersFragment.ValueListener,
         CategoryDialogFragment.CategoryListener, PersonDialogFragment.PersonListener {
@@ -79,7 +78,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
         }
     };
     private Unbinder unbinder;
-    private UserAdapterR userAdapter;
+    private UserAdapter userAdapter;
     private FragmentManager manager;
     private double value;
     private SparseArray<String> sparseArray = new SparseArray<>();
@@ -160,12 +159,13 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
         });
 
         try {
-            userAdapter = new UserAdapterR(this);
+            userAdapter = new UserAdapter();
             UserDBUtils.getAll(userDBCallback);
             participant.setAdapter(userAdapter);
-            userAdapter.setUserListener(new UserAdapterR.UserListener() {
+            userAdapter.setUserListener(new UserAdapter.UserListener() {
                 @Override
                 public void setValue(int position, int id) {
+                    showNumbers();
                     place = position;
                     idPlace = id;
                 }
@@ -249,11 +249,11 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
     }
 
     @Override
-    public void setPerson(String text, int color, int ids) {
+    public void setPerson(User user) {
         TextDrawable textDrawable = TextDrawable.builder()
-                .buildRound(Character.toString(text.charAt(0)), color);
+                .buildRound(Character.toString(user.getName().charAt(0)), user.getColor());
         imageUser.setImageDrawable(textDrawable);
-        idPaying = ids;
+        idPaying = user.getId();
     }
 
     @Override
@@ -264,15 +264,21 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
     }
 
     private void showNumbers() {
-        new NumbersFragment().show(manager, "Dialog");
+        NumbersFragment numbersFragment = new NumbersFragment();
+        numbersFragment.setListener(this);
+        numbersFragment.show(manager, "Dialog");
     }
 
     private void showCategory() {
-        new CategoryDialogFragment().show(manager, "Category");
+        CategoryDialogFragment categoryDialogFragment = new CategoryDialogFragment();
+        categoryDialogFragment.setListener(this);
+        categoryDialogFragment.show(manager, "Category");
     }
 
     private void showPerson() {
-        new PersonDialogFragment().show(manager, "Person");
+        PersonDialogFragment personDialogFragment = new PersonDialogFragment();
+        personDialogFragment.setListener(this);
+        personDialogFragment.show(manager, "Person");
     }
 
     private void setPaying(final int id) {
@@ -281,7 +287,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
                 @Override
                 public void run() {
                     User user = MyApplication.getHomeRoomDatabase().userDao().getUser(id);
-                    setPerson(user.getName(), user.getColor(), user.getId());
+                    setPerson(user);
                 }
             }).start();
         } catch (SQLiteException w) {
@@ -317,10 +323,6 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
         finish();
         setResult(RESULT_OK, getSupportParentActivityIntent());
     }
-
-//    private int getId() {
-//        return MyApplication.getHomeRoomDatabase().paymentDao().getLastId();
-//    }
 
     private void editFields() {
         setTitle(R.string.editing_operations);

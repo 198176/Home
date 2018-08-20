@@ -8,7 +8,7 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:padding="@dimen/fab_margin"
-    tools:context="com.example.adrian.homecalc.OperationActivity">
+    tools:context="com.example.adrian.homecalc.activity.OperationActivity">
 
     <TextView
         android:id="@+id/operation_value_text"

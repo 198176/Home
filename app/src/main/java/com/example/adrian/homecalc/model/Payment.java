@@ -12,14 +12,21 @@ public class Payment {
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String title;
-    private Double value;
+    private double value;
     private long date;
     private int category_id;
     private int paying_id;
     @Ignore
     private ArrayList<Participant> participants;
 
-    public Payment(String title, Double value, long date, int category_id, int paying_id) {
+    @Ignore
+    public Payment(double value, int paying_id, ArrayList<Participant> participants) {
+        this.value = value;
+        this.paying_id = paying_id;
+        this.participants = participants;
+    }
+
+    public Payment(String title, double value, long date, int category_id, int paying_id) {
         this.title = title;
         this.value = value;
         this.date = date;
@@ -29,11 +36,7 @@ public class Payment {
 
     @Ignore
     public Payment(String title, Double value, long date, int category_id, int paying_id, ArrayList<Participant> participants) {
-        this.title = title;
-        this.value = value;
-        this.date = date;
-        this.category_id = category_id;
-        this.paying_id = paying_id;
+        this(title, value, date, category_id, paying_id);
         this.participants = participants;
     }
 
@@ -53,11 +56,11 @@ public class Payment {
         this.title = title;
     }
 
-    public Double getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(Double value) {
+    public void setValue(double value) {
         this.value = value;
     }
 

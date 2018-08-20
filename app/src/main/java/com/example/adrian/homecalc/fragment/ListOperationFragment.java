@@ -1,11 +1,11 @@
-package com.example.adrian.homecalc;
+package com.example.adrian.homecalc.fragment;
 
 
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,15 +14,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.adrian.homecalc.adapter.ListOperationAdapter;
+import com.example.adrian.homecalc.MainActivity;
+import com.example.adrian.homecalc.activity.OperationActivity;
+import com.example.adrian.homecalc.R;
 import com.example.adrian.homecalc.database.DBCallbackCursor;
 import com.example.adrian.homecalc.database.PaymentDBUtils;
-import com.example.adrian.homecalc.sampledata.ExpenseSplitterActivity;
+import com.example.adrian.homecalc.activity.ExpenseSplitterActivity;
 
+import static com.example.adrian.homecalc.MainActivity.getDayBilling;
+import static com.example.adrian.homecalc.MainActivity.getPersonId;
+import static com.example.adrian.homecalc.MainActivity.getSpinnerDate;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class ListOperationFragment extends Fragment {
+public class ListOperationFragment extends Fragment implements ListOperationAdapter.OperationListener {
 
 
     ListOperationAdapter adapter;
@@ -41,35 +45,15 @@ public class ListOperationFragment extends Fragment {
             });
         }
     };
-    private Toast toast;
     private Bundle bundle;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        bundle = getArguments();
-        toast = Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = (RecyclerView) inflater.inflate(R.layout.dialog_category, container, false);
         view.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter = new ListOperationAdapter();
-        adapter.setOperationListener(new ListOperationAdapter.OperationListener() {
-            @Override
-            public void editOperation(int id, boolean isPlus) {
-                Intent intent = new Intent();
-                if (isPlus) {
-                    intent.setClass(getActivity(), OperationActivity.class);
-                } else {
-                    intent.setClass(getActivity(), ExpenseSplitterActivity.class);
-                }
-                intent.putExtra(OperationActivity.EDIT, id);
-                startActivityForResult(intent, 0);
-            }
-        });
+        bundle = getArguments();
+        adapter = new ListOperationAdapter(this);
         view.setAdapter(adapter);
         return view;
     }
@@ -83,14 +67,14 @@ public class ListOperationFragment extends Fragment {
                     PaymentDBUtils.getAllPlannedPayments(callbackCursor);
                 }
             } else {
-                if (MainActivity.person_id == -1) {
-                    PaymentDBUtils.getAllPaymentsWhereDateForAllUsers(callbackCursor, MainActivity.dayBilling, MainActivity.getSpinnerDate());
+                if (getPersonId() == -1) {
+                    PaymentDBUtils.getAllPaymentsByDateForAllUsers(callbackCursor, getDayBilling(), getSpinnerDate());
                 } else {
-                    PaymentDBUtils.getAllPaymentsWhereDateAndUser(callbackCursor, MainActivity.dayBilling, MainActivity.getSpinnerDate(), MainActivity.person_id);
+                    PaymentDBUtils.getAllPaymentsByDateAndUser(callbackCursor, getDayBilling(), getSpinnerDate(), getPersonId());
                 }
             }
         } catch (SQLiteException w) {
-            toast.show();
+            Toast.makeText(getActivity(), R.string.database_error, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -100,4 +84,15 @@ public class ListOperationFragment extends Fragment {
         cursor.close();
     }
 
+    @Override
+    public void editOperation(int id, boolean isPlus) {
+        Intent intent = new Intent();
+        if (isPlus) {
+            intent.setClass(view.getContext(), OperationActivity.class);
+        } else {
+            intent.setClass(view.getContext(), ExpenseSplitterActivity.class);
+        }
+        intent.putExtra(OperationActivity.EDIT, id);
+        startActivityForResult(intent, 0);
+    }
 }

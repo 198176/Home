@@ -1,10 +1,6 @@
-package com.example.adrian.homecalc;
+package com.example.adrian.homecalc.adapter;
 
-import android.content.Context;
-import android.database.Cursor;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -15,38 +11,35 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
+import com.example.adrian.homecalc.R;
+import com.example.adrian.homecalc.model.User;
 
-/**
- * Created by Adrian on 2018-03-14.
- */
+import java.util.ArrayList;
 
 public class UserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private UserListener userListener;
     private PersonListener personListener;
-    private Context context;
     private SparseArray<String> sparseArray;
-    private Cursor cursor;
     private int flag = 0;
+    private ArrayList<User> users;
 
-    public UserAdapter(Cursor cursor) {
-        this.cursor = cursor;
+    public void setFlagAllUsers(boolean flag) {
+        this.flag = (flag) ? 1 : 0;
     }
 
-    public UserAdapter(Cursor cursor, boolean flag) {
-        this.cursor = cursor;
-        if(flag) this.flag = 1;
+    public void setUsers(ArrayList<User> users) {
+        this.users = users;
     }
 
-    public UserAdapter(Context context, Cursor cursor, SparseArray<String> sparseArray) {
-        this.context = context;
-        this.cursor = cursor;
+    public void setUsers(ArrayList<User> users, SparseArray<String> sparseArray) {
+        this.users = users;
         this.sparseArray = sparseArray;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position < cursor.getCount()) {
+        if (position < users.size()) {
             return 0;
         } else {
             return 1;
@@ -69,7 +62,7 @@ public class UserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         switch (holder.getItemViewType()) {
             case 0:
-                ((UserViewHolder) holder).bind(position);
+                ((UserViewHolder) holder).bind(users.get(position), position);
                 break;
             case 1:
                 ((AllUserViewHolder) holder).bind();
@@ -79,7 +72,7 @@ public class UserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        if(cursor != null) return cursor.getCount() + flag;
+        if (users != null) return users.size() + flag;
         return 0;
     }
 
@@ -91,20 +84,14 @@ public class UserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.personListener = personListener;
     }
 
-    void showNumbers() {
-        FragmentManager manager = ((AppCompatActivity) context).getSupportFragmentManager();
-        NumbersFragment fragment = new NumbersFragment();
-        fragment.show(manager, "Dialog");
-    }
-
-    interface UserListener {
+    public interface UserListener {
         void setValue(int position, int id);
 
         void setBalance(int position, int id);
     }
 
-    interface PersonListener {
-        void setPerson(String text, int color, int id);
+    public interface PersonListener {
+        void setPerson(User user);
     }
 
     class UserViewHolder extends RecyclerView.ViewHolder {
@@ -117,38 +104,34 @@ public class UserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         UserViewHolder(View itemView) {
             super(itemView);
             parent = itemView;
-            categoryTitle = (TextView) parent.findViewById(R.id.category_title);
-            image = (ImageView) parent.findViewById(R.id.image_user);
-            imageButton = (ImageButton) parent.findViewById(R.id.rest_cost);
-            value = (TextView) parent.findViewById(R.id.category_value);
+            categoryTitle = parent.findViewById(R.id.category_title);
+            image = parent.findViewById(R.id.image_user);
+            imageButton = parent.findViewById(R.id.rest_cost);
+            value = parent.findViewById(R.id.category_value);
         }
 
-        void bind(final int position) {
-            cursor.moveToPosition(position);
-            categoryTitle.setText(cursor.getString(0));
+        void bind(final User user, final int position) {
+            categoryTitle.setText(user.getName());
             TextDrawable textDrawable = TextDrawable.builder()
-                    .buildRound(Character.toString(cursor.getString(0).charAt(0)), cursor.getInt(1));
+                    .buildRound(Character.toString(user.getName().charAt(0)), user.getColor());
             image.setImageDrawable(textDrawable);
             if (sparseArray != null) {
                 if (sparseArray.size() != 0) {
-                    value.setText(sparseArray.get(cursor.getInt(2)));
+                    value.setText(sparseArray.get(user.getId()));
                 }
                 imageButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (userListener != null) {
-                            cursor.moveToPosition(position);
-                            userListener.setBalance(position, cursor.getInt(2));
+                            userListener.setBalance(position, user.getId());
                         }
                     }
                 });
                 parent.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showNumbers();
                         if (userListener != null) {
-                            cursor.moveToPosition(position);
-                            userListener.setValue(position, cursor.getInt(2));
+                            userListener.setValue(position, user.getId());
                         }
                     }
                 });
@@ -158,8 +141,7 @@ public class UserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     @Override
                     public void onClick(View v) {
                         if (personListener != null) {
-                            cursor.moveToPosition(position);
-                            personListener.setPerson(cursor.getString(0), cursor.getInt(1), cursor.getInt(2));
+                            personListener.setPerson(user);
                         }
                     }
                 });
@@ -176,8 +158,8 @@ public class UserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         AllUserViewHolder(View itemView) {
             super(itemView);
             parent = itemView;
-            categoryTitle = (TextView) parent.findViewById(R.id.category_title);
-            image = (ImageView) parent.findViewById(R.id.image_user);
+            categoryTitle = parent.findViewById(R.id.category_title);
+            image = parent.findViewById(R.id.image_user);
             imageButton = (ImageButton) parent.findViewById(R.id.rest_cost);
         }
 
@@ -189,10 +171,11 @@ public class UserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     if (personListener != null) {
-                        personListener.setPerson("", -1, R.drawable.ic_user);
+                        personListener.setPerson(null);
                     }
                 }
             });
         }
     }
 }
+

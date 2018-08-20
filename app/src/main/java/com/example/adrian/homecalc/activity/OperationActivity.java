@@ -1,13 +1,9 @@
-package com.example.adrian.homecalc;
+package com.example.adrian.homecalc.activity;
 
 import android.app.DatePickerDialog;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -21,16 +17,42 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.example.adrian.homecalc.MyApplication;
+import com.example.adrian.homecalc.dialog.NumbersFragment;
+import com.example.adrian.homecalc.R;
+import com.example.adrian.homecalc.database.ParticipantDBUtils;
+import com.example.adrian.homecalc.database.PaymentDBUtils;
+import com.example.adrian.homecalc.dialog.CategoryDialogFragment;
+import com.example.adrian.homecalc.model.Category;
+import com.example.adrian.homecalc.model.Participant;
+import com.example.adrian.homecalc.model.Payment;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public class OperationActivity extends AppCompatActivity implements NumbersFragment.ValueListener,
         CategoryDialogFragment.CategoryListener {
 
     public static final String EDIT = "edit";
+    @BindView(R.id.operation_date)
+    EditText dateText;
+    @BindView(R.id.operation_value)
+    EditText valueText;
+    @BindView(R.id.operation_category)
+    EditText categoryText;
+    @BindView(R.id.operation_title)
+    EditText titleText;
+    @BindView(R.id.radio_group)
+    RadioGroup radioGroup;
+    @BindView(R.id.expense_operation_button)
+    Button buttonOperation;
     private SimpleDateFormat dateFormat;
     private Calendar dateTime = Calendar.getInstance();
-    private EditText dateText, valueText, categoryText, titleText;
     DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
 
         @Override
@@ -41,14 +63,15 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
             updateDate();
         }
     };
-    private SQLiteDatabase db;
-    private RadioGroup radioGroup;
-    private int ids;
+    private Unbinder unbinder;
+    private int idCategory;
     private double value;
     private int idEdit = -1;
     private boolean plus;
     private Toast toast;
     private FragmentManager manager;
+    private Payment payment;
+    private ArrayList<Participant> participants;
 
     public static String replaceDoubleToString(double value) {
         String text = String.format("%.2f", value);
@@ -64,32 +87,32 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_operation);
+        unbinder = ButterKnife.bind(this);
         Intent intent = getIntent();
         idEdit = intent.getIntExtra(EDIT, -1);
         toast = Toast.makeText(this, R.string.database_error, Toast.LENGTH_SHORT);
         manager = getSupportFragmentManager();
-        SQLiteOpenHelper helper = new ApplicationDatabase(this);
-        db = helper.getWritableDatabase();
-        valueText = (EditText) findViewById(R.id.operation_value);
-        categoryText = (EditText) findViewById(R.id.operation_category);
-        titleText = (EditText) findViewById(R.id.operation_title);
-        dateText = (EditText) findViewById(R.id.operation_date);
-        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
-        Button button = (Button) findViewById(R.id.expense_operation_button);
         dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
         try {
             if (idEdit != -1) {
                 editFields();
             } else {
+                participants = new ArrayList<>();
                 updateDate();
-                Cursor cursor = db.rawQuery("SELECT NAME, _id FROM CATEGORY WHERE DEFAULTS = 1", null);
-                if (cursor.moveToFirst()) {
-                    ids = cursor.getInt(1);
-                    categoryText.setText(cursor.getString(0));
-                    titleText.setHint(cursor.getString(0));
-                }
-                cursor.close();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final Category category = MyApplication.getHomeRoomDatabase().categoryDao().getDefaultCategory();
+                        OperationActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                idCategory = category.getId();
+                                categoryText.setText(category.getName());
+                                titleText.setHint(category.getName());
+                            }
+                        });
+                    }
+                }).start();
             }
         } catch (SQLiteException w) {
             toast.show();
@@ -119,7 +142,7 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
             }
         });
 
-        button.setOnClickListener(new View.OnClickListener() {
+        buttonOperation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int radioId = radioGroup.getCheckedRadioButtonId();
@@ -149,21 +172,24 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
 
     @Override
     public void setCategory(String text, int ids) {
-        this.ids = ids;
+        idCategory = ids;
         categoryText.setText(text);
         titleText.setHint(text);
     }
 
     private void showNumbers() {
-        new NumbersFragment().show(manager, "Dialog");
+        NumbersFragment numbersFragment = new NumbersFragment();
+        numbersFragment.setListener(this);
+        numbersFragment.show(manager, "Dialog");
     }
 
     private void showCategory() {
-        new CategoryDialogFragment().show(manager, "Category");
+        CategoryDialogFragment categoryDialogFragment = new CategoryDialogFragment();
+        categoryDialogFragment.setListener(this);
+        categoryDialogFragment.show(manager, "Category");
     }
 
     private void createOperation() {
-        ContentValues values = new ContentValues();
         String title = titleText.getText().toString();
         if (!plus) {
             value *= -1;
@@ -172,18 +198,19 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
             title = titleText.getHint().toString();
         }
         try {
-            values.put("TITLE", title);
-            values.put("VALUE", value);
-            values.put("DATE", dateTime.getTimeInMillis());
-            values.put("CATEGORY_ID", ids);
             if (idEdit == -1) {
-                values.put("ID_PAY", getId() + 1);
-                values.put("PAYING_ID", 1);
-                values.put("PERSON_ID", 1);
-                db.insert(ApplicationDatabase.PAYMENT, null, values);
+                participants.add(new Participant(1, value));
+                PaymentDBUtils.insert(new Payment(title, value, dateTime.getTimeInMillis(), idCategory, 1, participants));
             } else {
-                db.update(ApplicationDatabase.PAYMENT, values, "ID_PAY = ?",
-                        new String[]{Integer.toString(idEdit)});
+                participants = payment.getParticipants();
+                participants.get(0).setUser_value(value);
+                payment.setTitle(title);
+                payment.setValue(value);
+                payment.setCategory_id(idCategory);
+                payment.setParticipants(participants);
+                payment.setDate(dateTime.getTimeInMillis());
+                PaymentDBUtils.update(payment);
+                ParticipantDBUtils.update(participants.get(0));
             }
         } catch (SQLiteException w) {
             toast.show();
@@ -192,28 +219,31 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
         startActivity(getSupportParentActivityIntent());
     }
 
-    private int getId() {
-        Cursor cursor = db.rawQuery("SELECT _id FROM PAYMENT WHERE _id = ( SELECT MAX(_id) FROM PAYMENT)", null);
-        cursor.moveToFirst();
-        if (cursor.getCount() > 0) {
-            return cursor.getInt(0);
-        } else {
-            return 0;
-        }
-    }
-
     private void editFields() {
         setTitle(R.string.editing_operations);
-        Cursor cursor = db.rawQuery("SELECT P.TITLE, P.VALUE, strftime('%Y-%m-%d', datetime(DATE/1000, 'unixepoch', 'localtime')), " +
-                "P.CATEGORY_ID, C.NAME FROM PAYMENT AS P, CATEGORY AS C WHERE P.CATEGORY_ID = C._id " +
-                "AND P.ID_PAY = " + idEdit, null);
-        cursor.moveToFirst();
-        titleText.setText(cursor.getString(0));
-        valueText.setText(replaceDoubleToString(cursor.getDouble(1)));
-        dateText.setText(cursor.getString(2));
-        ids = cursor.getInt(3);
-        categoryText.setText(cursor.getString(4));
-        cursor.close();
+        try {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    payment = MyApplication.getHomeRoomDatabase().paymentDao().getPaymentById(idEdit);
+                    payment.setParticipants((ArrayList<Participant>) MyApplication.getHomeRoomDatabase().participantDao().getAllById(payment.getId()));
+                    final Category category = MyApplication.getHomeRoomDatabase().categoryDao().getCategoryById(payment.getCategory_id());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            titleText.setText(payment.getTitle());
+                            categoryText.setText(category.getName());
+                            idCategory = payment.getCategory_id();
+                            dateTime.setTimeInMillis(payment.getDate());
+                            valueText.setText(replaceDoubleToString(Math.abs(payment.getValue())));
+                            updateDate();
+                        }
+                    });
+                }
+            }).start();
+        } catch (SQLiteException w) {
+            toast.show();
+        }
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -244,8 +274,14 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
     }
 
     private void deleteOperation() {
-        db.delete(ApplicationDatabase.PAYMENT, "ID_PAY = ?", new String[]{Integer.toString(idEdit)});
+        PaymentDBUtils.delete(payment);
         finish();
         setResult(RESULT_OK, getSupportParentActivityIntent());
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbinder.unbind();
     }
 }

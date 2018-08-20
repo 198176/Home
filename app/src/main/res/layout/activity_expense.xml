@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    tools:context="com.example.adrian.homecalc.OperationActivity">
+    tools:context="com.example.adrian.homecalc.activity.OperationActivity">
 
 <android.support.constraint.ConstraintLayout
     android:id="@+id/expense_container"

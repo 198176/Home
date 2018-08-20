@@ -1,50 +1,52 @@
-package com.example.adrian.homecalc;
+package com.example.adrian.homecalc.adapter;
 
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-/**
- * Created by Adrian on 2017-08-26.
- */
+import com.example.adrian.homecalc.R;
 
 public class ListOperationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Cursor cursor;
     private OperationListener listener;
 
-    void setCursor(Cursor cursor){
+    public ListOperationAdapter() {
+    }
+
+    public ListOperationAdapter(OperationListener listener) {
+        this.listener = listener;
+    }
+
+    public void setCursor(Cursor cursor) {
         this.cursor = cursor;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new OperationViewHolder(LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_list_operation, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        ((OperationViewHolder)holder).bind(position);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
+        ((OperationViewHolder) holder).bind(position);
     }
 
     @Override
     public int getItemCount() {
-        return  (cursor == null) ? 0 : cursor.getCount();
+        return (cursor == null) ? 0 : cursor.getCount();
     }
 
-    public void setOperationListener(OperationListener listener) {
-        this.listener = listener;
-    }
-
-    interface OperationListener {
+    public interface OperationListener {
         void editOperation(int id, boolean isPlus);
     }
 
@@ -57,7 +59,7 @@ public class ListOperationAdapter extends RecyclerView.Adapter<RecyclerView.View
         TextView category;
         FloatingActionButton floating;
 
-        public OperationViewHolder(View v) {
+        OperationViewHolder(View v) {
             super(v);
             parent = v;
             title = v.findViewById(R.id.title_operation);
@@ -67,7 +69,7 @@ public class ListOperationAdapter extends RecyclerView.Adapter<RecyclerView.View
             floating = v.findViewById(R.id.floatingCategory);
         }
 
-        void bind(final int position){
+        void bind(final int position) {
             String mark = "";
             cursor.moveToPosition(position);
             title.setText(cursor.getString(cursor.getColumnIndex("title")));

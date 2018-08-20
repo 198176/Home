@@ -22,6 +22,12 @@ public interface CategoryDao {
     @Query("SELECT * FROM CATEGORIES WHERE DEFAULTS = 1")
     Category getDefaultCategory();
 
+    @Query("SELECT COUNT(name) FROM Categories WHERE name = :name")
+    int getCountTheSameNameCategory(String name);
+
+    @Query("UPDATE Categories SET defaults = 0 WHERE defaults = 1")
+    void updateDefaultOnFalse();
+
     @Insert
     void insert(Category... payments);
 

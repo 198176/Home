@@ -14,6 +14,15 @@ public abstract class CategoryDBUtils {
         }).start();
     }
 
+    public static void updateDefaultOnFalse() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MyApplication.getHomeRoomDatabase().categoryDao().updateDefaultOnFalse();
+            }
+        }).start();
+    }
+
     public static void delete(final Category category) {
         new Thread(new Runnable() {
             @Override

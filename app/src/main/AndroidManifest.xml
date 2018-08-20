@@ -16,12 +16,11 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".OperationActivity"
+            android:name=".activity.OperationActivity"
             android:label="@string/title_activity_operation"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -29,25 +28,12 @@
                 android:value="com.example.adrian.homecalc.MainActivity" />
         </activity>
         <activity
-            android:name=".NewCategoryActivity"
-            android:label="@string/title_activity_new_category" />
-        <activity
-            android:name=".DrawerActivity"
+            android:name=".activity.DrawerActivity"
             android:parentActivityName=".MainActivity" />
         <activity
-            android:name=".NewUserActivity"
-            android:label="@string/title_activity_new_user" />
-        <activity
-            android:name=".ExpenseActivity"
+            android:name=".activity.ExpenseSplitterActivity"
             android:label="@string/title_activity_operation"
             android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".sampledata.ExpenseSplitterActivity"
-            android:label="@string/title_activity_operation"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".NewRepaymentActivity"
-            android:label="Nowa spłata"/>
     </application>
 
 </manifest>

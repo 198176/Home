@@ -1,159 +1,182 @@
-package com.example.adrian.homecalc;
+package com.example.adrian.homecalc.dialog;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.adrian.homecalc.R;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 public class NumbersFragment extends DialogFragment {
 
-    private AlertDialog.Builder builder;
+    @BindView(R.id.numbers)
+    TextView numbers;
+    @BindView(R.id.nine)
+    Button nineButton;
+    @BindView(R.id.eight)
+    Button eightButton;
+    @BindView(R.id.seven)
+    Button sevenButton;
+    @BindView(R.id.six)
+    Button sixButton;
+    @BindView(R.id.five)
+    Button fiveButton;
+    @BindView(R.id.four)
+    Button fourButton;
+    @BindView(R.id.three)
+    Button threeButton;
+    @BindView(R.id.two)
+    Button twoButton;
+    @BindView(R.id.one)
+    Button oneButton;
+    @BindView(R.id.zero)
+    Button zeroButton;
+    @BindView(R.id.division)
+    Button divButton;
+    @BindView(R.id.multiplication)
+    Button multiButton;
+    @BindView(R.id.subtraction)
+    Button subButton;
+    @BindView(R.id.addition)
+    Button addButton;
+    @BindView(R.id.separator)
+    Button sepButton;
+    @BindView(R.id.equals)
+    Button eqButton;
+    @BindView(R.id.back)
+    ImageButton backButton;
+    @BindView(R.id.cancel)
+    Button cancelButton;
+    @BindView(R.id.ok)
+    Button okButton;
+    private Unbinder unbinder;
     private AlertDialog dialog;
-    private View view;
-    private TextView numbers;
     private boolean pointer, marker;
     private byte countAfter, countBefore, countIndex;
-
-    public interface ValueListener{
-        void setValue(String text);
-    }
-
     private ValueListener listener;
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        view = inflater.inflate(R.layout.dialog_numbers, null);
+        View view = inflater.inflate(R.layout.dialog_numbers, null);
+        unbinder = ButterKnife.bind(this, view);
         dialogNumbers();
+        builder.setView(view);
+        dialog = builder.create();
         return dialog;
     }
 
-    private void dialogNumbers(){
+    private void dialogNumbers() {
         pointer = false;
         marker = false;
         countBefore = 0;
         countIndex = 0;
         countAfter = 0;
 
-        numbers = (TextView) view.findViewById(R.id.numbers);
-        final Button nine = (Button) view.findViewById(R.id.nine);
-        nine.setOnClickListener(new View.OnClickListener() {
+        nineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertNumber(nine.getText());
+                insertNumber(nineButton.getText());
             }
         });
-        final Button eight = (Button) view.findViewById(R.id.eight);
-        eight.setOnClickListener(new View.OnClickListener() {
+        eightButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertNumber(eight.getText());
+                insertNumber(eightButton.getText());
             }
         });
-        final Button seven = (Button) view.findViewById(R.id.seven);
-        seven.setOnClickListener(new View.OnClickListener() {
+        sevenButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertNumber(seven.getText());            }
-        });
-        final Button six = (Button) view.findViewById(R.id.six);
-        six.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                insertNumber(six.getText());
+                insertNumber(sevenButton.getText());
             }
         });
-        final Button five = (Button) view.findViewById(R.id.five);
-        five.setOnClickListener(new View.OnClickListener() {
+        sixButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertNumber(five.getText());
+                insertNumber(sixButton.getText());
             }
         });
-        final Button four = (Button) view.findViewById(R.id.four);
-        four.setOnClickListener(new View.OnClickListener() {
+        fiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertNumber(four.getText());
+                insertNumber(fiveButton.getText());
             }
         });
-        final Button three = (Button) view.findViewById(R.id.three);
-        three.setOnClickListener(new View.OnClickListener() {
+        fourButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertNumber(three.getText());
+                insertNumber(fourButton.getText());
             }
         });
-        final Button two = (Button) view.findViewById(R.id.two);
-        two.setOnClickListener(new View.OnClickListener() {
+        threeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertNumber(two.getText());
+                insertNumber(threeButton.getText());
             }
         });
-        final Button one = (Button) view.findViewById(R.id.one);
-        one.setOnClickListener(new View.OnClickListener() {
+        twoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertNumber(one.getText());
+                insertNumber(twoButton.getText());
             }
         });
-        final Button zero = (Button) view.findViewById(R.id.zero);
-        zero.setOnClickListener(new View.OnClickListener() {
+        oneButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertNumber(zero.getText());
+                insertNumber(oneButton.getText());
             }
         });
-        final Button div = (Button) view.findViewById(R.id.division);
-        div.setOnClickListener(new View.OnClickListener() {
+        zeroButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertMark(div.getText());
+                insertNumber(zeroButton.getText());
             }
         });
-        final Button multi = (Button) view.findViewById(R.id.multiplication);
-        multi.setOnClickListener(new View.OnClickListener() {
+        divButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertMark(multi.getText());
+                insertMark(divButton.getText());
             }
         });
-        final Button sub = (Button) view.findViewById(R.id.subtraction);
-        sub.setOnClickListener(new View.OnClickListener() {
+        multiButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertMark(sub.getText());
+                insertMark(multiButton.getText());
             }
         });
-        final Button add = (Button) view.findViewById(R.id.addition);
-        add.setOnClickListener(new View.OnClickListener() {
+        subButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                insertMark(add.getText());
+                insertMark(subButton.getText());
             }
         });
-        final Button sep = (Button) view.findViewById(R.id.separator);
-        sep.setOnClickListener(new View.OnClickListener() {
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                insertMark(addButton.getText());
+            }
+        });
+        sepButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 insertPoint();
             }
         });
-        Button eq = (Button) view.findViewById(R.id.equals);
-        eq.setOnClickListener(new View.OnClickListener() {
+        eqButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -163,26 +186,19 @@ public class NumbersFragment extends DialogFragment {
                 }
             }
         });
-        ImageButton back = (ImageButton) view.findViewById(R.id.back);
-        back.setOnClickListener(new View.OnClickListener() {
+        backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 backSpace();
             }
         });
-
-        builder.setView(view);
-        dialog = builder.create();
-
-        Button cancel = (Button) view.findViewById(R.id.cancel);
-        cancel.setOnClickListener(new View.OnClickListener() {
+        cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
             }
         });
-        Button ok = (Button) view.findViewById(R.id.ok);
-        ok.setOnClickListener(new View.OnClickListener() {
+        okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -198,30 +214,25 @@ public class NumbersFragment extends DialogFragment {
                 }
             }
         });
-
-        //dialog.show();
     }
 
-    private void insertNumber(CharSequence num){
+    private void insertNumber(CharSequence num) {
         String number = numbers.getText().toString();
-        if(countBefore==1 && number.equals("0")){
+        if (countBefore == 1 && number.equals("0")) {
             numbers.setText(num);
-        }
-        else if(countBefore==1 && marker && number.substring(countIndex+4).equals("0")){
-            numbers.setText(number.substring(0,(countIndex+4))+num);
-        }
-        else if(!pointer && countBefore<6){
+        } else if (countBefore == 1 && marker && number.substring(countIndex + 4).equals("0")) {
+            numbers.setText(number.substring(0, (countIndex + 4)) + num);
+        } else if (!pointer && countBefore < 6) {
             countBefore++;
-            numbers.setText(number+num);
-        }
-        else if(pointer && countAfter<2){
+            numbers.setText(number + num);
+        } else if (pointer && countAfter < 2) {
             countAfter++;
-            numbers.setText(number+num);
+            numbers.setText(number + num);
         }
     }
 
-    private void insertPoint(){
-        if(!pointer) {
+    private void insertPoint() {
+        if (!pointer) {
             if (countBefore == 0) {
                 insertNumber("0");
             }
@@ -231,8 +242,8 @@ public class NumbersFragment extends DialogFragment {
         }
     }
 
-    private void insertMark(CharSequence mark){
-        if(!marker) {
+    private void insertMark(CharSequence mark) {
+        if (!marker) {
             insertZeros();
             pointer = false;
             marker = true;
@@ -240,8 +251,7 @@ public class NumbersFragment extends DialogFragment {
             countIndex = countBefore;
             countBefore = 0;
             numbers.setText(numbers.getText() + mark.toString());
-        }
-        else {
+        } else {
             try {
                 score();
                 insertMark(mark);
@@ -251,79 +261,73 @@ public class NumbersFragment extends DialogFragment {
         }
     }
 
-    private void backSpace(){
+    private void backSpace() {
         boolean empty = false;
         int len = numbers.getText().length() - 1;
-        if(countAfter>0){
+        if (countAfter > 0) {
             countAfter--;
-        }
-        else if(pointer){
+        } else if (pointer) {
             pointer = false;
-        }
-        else if(countBefore>0){
+        } else if (countBefore > 0) {
             countBefore--;
-        }
-        else if(marker){
+        } else if (marker) {
             marker = false;
             pointer = true;
             countAfter = 2;
             countBefore = countIndex;
-        }
-        else{
+        } else {
             empty = true;
         }
-        if(!empty) {
+        if (!empty) {
             numbers.setText(numbers.getText().subSequence(0, len));
         }
     }
 
     private void score() throws ToastException {
-        if(marker && countBefore>0){
+        if (marker && countBefore > 0) {
             double result = 0.0;
             String operation = numbers.getText().toString();
             operation = operation.replace(",", ".");
-            String op1 = operation.substring(0, (countIndex+3));
-            String opMark = operation.substring((countIndex+3),(countIndex+4));
-            String op2 = operation.substring(countIndex+4);
+            String op1 = operation.substring(0, (countIndex + 3));
+            String opMark = operation.substring((countIndex + 3), (countIndex + 4));
+            String op2 = operation.substring(countIndex + 4);
             double num1 = Double.parseDouble(op1);
             double num2 = Double.parseDouble(op2);
-            switch (opMark){
+            switch (opMark) {
                 case "+":
-                    result=num1+num2;
+                    result = num1 + num2;
                     break;
                 case "-":
-                    result=num1-num2;
-                    if(result<0){
+                    result = num1 - num2;
+                    if (result < 0) {
                         throw new ToastException();
                     }
                     break;
                 case "*":
-                    result=num1*num2;
+                    result = num1 * num2;
                     break;
                 case "/":
-                    if(num2==0){
+                    if (num2 == 0) {
                         throw new ToastException();
                     }
-                    result=num1/num2;
+                    result = num1 / num2;
                     break;
             }
             operation = String.format("%.2f", result);
             operation = operation.replace(".", ",");
-            countBefore =(byte) operation.substring(0,(operation.indexOf(","))).length();
+            countBefore = (byte) operation.substring(0, (operation.indexOf(","))).length();
             countAfter = 2;
             pointer = true;
             marker = false;
             numbers.setText(operation);
-        }
-        else if(marker){
+        } else if (marker) {
             backSpace();
-        }
-        else {
+        } else {
             insertZeros();
         }
     }
 
-    private void insertZeros(){
+    private void insertZeros() {
         while (countAfter < 2) {
             if (!pointer) {
                 insertPoint();
@@ -333,15 +337,23 @@ public class NumbersFragment extends DialogFragment {
         }
     }
 
-    private class ToastException extends Exception{
-        ToastException(){
-            Toast.makeText(getActivity(), "Operacja nieprawidłowa", Toast.LENGTH_SHORT).show();
-        }
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.listener = (ValueListener) activity;
+    public void setListener(ValueListener listener) {
+        this.listener = listener;
+    }
+
+    public interface ValueListener {
+        void setValue(String text);
+    }
+
+    private class ToastException extends Exception {
+        ToastException() {
+            Toast.makeText(getActivity(), "Operacja nieprawidłowa", Toast.LENGTH_SHORT).show();
+        }
     }
 }

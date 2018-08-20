@@ -3,8 +3,10 @@ package com.example.adrian.homecalc.model;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(tableName = "Users")
-public class User {
+public class User implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
