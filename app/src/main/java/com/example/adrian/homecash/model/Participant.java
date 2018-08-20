@@ -1,0 +1,63 @@
+package com.example.adrian.homecash.model;
+
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+@Entity(tableName = "Participants", foreignKeys = @ForeignKey(entity =  Payment.class,
+        parentColumns = "id", childColumns = "payment_id", onDelete = CASCADE))
+public class Participant {
+
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+    private long payment_id;
+    private int user_id;
+    private double user_value;
+
+    @Ignore
+    public Participant(int user_id, double user_value){
+        this.user_id = user_id;
+        this.user_value = user_value;
+    }
+
+    public Participant(long payment_id, int user_id, double user_value) {
+        this.payment_id = payment_id;
+        this.user_id = user_id;
+        this.user_value = user_value;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
+    }
+
+    public double getUser_value() {
+        return user_value;
+    }
+
+    public void setUser_value(double user_value) {
+        this.user_value = user_value;
+    }
+
+    public long getPayment_id() {
+        return payment_id;
+    }
+
+    public void setPayment_id(long payment_id) {
+        this.payment_id = payment_id;
+    }
+}
