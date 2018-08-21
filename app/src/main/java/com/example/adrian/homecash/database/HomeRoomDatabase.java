@@ -36,7 +36,7 @@ public abstract class HomeRoomDatabase extends RoomDatabase {
                     @Override
                     public void run() {
                         getInstance(context).categoryDao().insert(defaultsCategory());
-                        getInstance(context).userDao().insert(new User("Ja", 0xFF1976D2));
+                        //getInstance(context).userDao().insert(new User("Ja", 0xFF1976D2));
                     }
                 });
             }

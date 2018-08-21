@@ -29,4 +29,5 @@
     <string name="income">WPŁYWY</string>
     <string name="expenses">WYDATKI</string>
     <string name="title_new_repayment">Nowa spłata</string>
+    <string name="sign_in">Logowanie</string>
 </resources>

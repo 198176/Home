@@ -38,11 +38,16 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.example.adrian.homecash.activity.DrawerActivity;
 import com.example.adrian.homecash.activity.ExpenseSplitterActivity;
 import com.example.adrian.homecash.activity.OperationActivity;
+import com.example.adrian.homecash.database.UserDBUtils;
 import com.example.adrian.homecash.dialog.PersonDialogFragment;
 import com.example.adrian.homecash.fragment.ListOperationFragment;
 import com.example.adrian.homecash.fragment.ListPersonOperationFragment;
 import com.example.adrian.homecash.fragment.ListSummaryFragment;
+import com.example.adrian.homecash.graphic.CircleTransform;
 import com.example.adrian.homecash.model.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -106,6 +111,22 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_drawer_main);
         unbinder = ButterKnife.bind(this);
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser == null) {
+            startActivity(new Intent(this, SignInActivity.class));
+            finish();
+        } else {
+            String emailUser = firebaseUser.getEmail();
+            String nameUser = firebaseUser.getDisplayName();
+            View header = navigationView.getHeaderView(0);
+            TextView textMail = header.findViewById(R.id.header_mail_user);
+            TextView textUser = header.findViewById(R.id.header_name_user);
+            ImageView imageUser = header.findViewById(R.id.header_image_user);
+            textMail.setText(emailUser);
+            textUser.setText(nameUser);
+            Picasso.get().load(firebaseUser.getPhotoUrl()).transform(new CircleTransform()).into(imageUser);
+        }
         preferences = getSharedPreferences("prefer", 0);
         dayBilling = preferences.getInt("day", 1);
 

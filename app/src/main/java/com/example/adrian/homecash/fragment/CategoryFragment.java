@@ -45,7 +45,6 @@ public class CategoryFragment extends Fragment implements NewCategoryFragment.Li
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adapter = new CategoryAdapter();
-        CategoryDBUtils.getAll(categoryDBCallback);
     }
 
     @Override
@@ -54,6 +53,7 @@ public class CategoryFragment extends Fragment implements NewCategoryFragment.Li
         view = (RecyclerView) inflater.inflate(R.layout.dialog_category, container, false);
         view.setLayoutManager(new LinearLayoutManager(getActivity()));
         view.setAdapter(adapter);
+        CategoryDBUtils.getAll(categoryDBCallback);
         getActivity().setTitle("Kategorie");
         FloatingActionButton fab = getActivity().findViewById(R.id.drawer_fab);
         fab.setVisibility(View.VISIBLE);

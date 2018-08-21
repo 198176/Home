@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.adrian.homecash">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
@@ -16,6 +18,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -34,6 +37,7 @@
             android:name=".activity.ExpenseSplitterActivity"
             android:label="@string/title_activity_operation"
             android:parentActivityName=".MainActivity" />
+        <activity android:name=".SignInActivity"/>
     </application>
 
 </manifest>

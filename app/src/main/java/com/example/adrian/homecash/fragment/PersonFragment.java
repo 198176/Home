@@ -46,7 +46,6 @@ public class PersonFragment extends Fragment implements NewUserFragment.Listener
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         userAdapter = new UserAdapter();
-        UserDBUtils.getAll(userDBCallback);
     }
 
     @Override
@@ -55,6 +54,7 @@ public class PersonFragment extends Fragment implements NewUserFragment.Listener
         view = (RecyclerView) inflater.inflate(R.layout.dialog_category, null);
         view.setLayoutManager(new LinearLayoutManager(getActivity()));
         view.setAdapter(userAdapter);
+        UserDBUtils.getAll(userDBCallback);
         getActivity().setTitle("Użytkownicy");
         FloatingActionButton fab = getActivity().findViewById(R.id.drawer_fab);
         fab.setVisibility(View.VISIBLE);
