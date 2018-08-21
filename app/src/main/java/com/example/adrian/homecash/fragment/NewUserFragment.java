@@ -23,10 +23,16 @@ import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.example.adrian.homecash.MyApplication;
-import com.example.adrian.homecash.activity.OperationActivity;
 import com.example.adrian.homecash.R;
+import com.example.adrian.homecash.activity.OperationActivity;
 import com.example.adrian.homecash.database.UserDBUtils;
 import com.example.adrian.homecash.model.User;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,6 +45,8 @@ public class NewUserFragment extends Fragment {
     ImageView imageColor;
     @BindView(R.id.new_title)
     EditText title;
+    @BindView(R.id.new_mail)
+    EditText mail;
     @BindView(R.id.image_view)
     ImageView image;
     @BindView(R.id.button_user)
@@ -48,6 +56,7 @@ public class NewUserFragment extends Fragment {
     private Unbinder unbinder;
     private int colour;
     private String name;
+    private String email;
     private User user;
     private Listener listener;
 
@@ -67,16 +76,33 @@ public class NewUserFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 name = title.getText().toString().trim();
-                if (name.length() != 0) {
-                    createUser();
-                } else {
-                    Toast.makeText(getActivity(), "Użytkownik musi mieć nazwę", Toast.LENGTH_SHORT).show();
-                }
+                email = mail.getText().toString().trim();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final int count = MyApplication.getHomeRoomDatabase().userDao().getCountUserByEmail(email);
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (count == 0) {
+                                    if (name.length() != 0) {
+                                        checkMail();
+                                    } else {
+                                        Toast.makeText(getActivity(), "Użytkownik musi mieć nazwę", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(getActivity(), "Posiadasz już użytkownika o podanym adresie email", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                }).start();
             }
         });
         if (user != null) {
             getActivity().setTitle("Edycja użytkownika");
             title.setText(user.getName());
+            mail.setText(user.getMail());
             imageColor.setBackgroundColor(user.getColor());
             colour = user.getColor();
             button.setText("Edytuj");
@@ -119,7 +145,7 @@ public class NewUserFragment extends Fragment {
 
     public void createUser() {
         if (user == null) {
-            user = new User(name, colour);
+            user = new User(name, email, colour);
             UserDBUtils.insert(user);
             if (listener != null) {
                 listener.onClick(user, false);
@@ -130,6 +156,26 @@ public class NewUserFragment extends Fragment {
             UserDBUtils.update(user);
         }
         getFragmentManager().popBackStack();
+    }
+
+    private void checkMail() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        Query query = databaseReference.child("users").orderByChild("email").equalTo(email);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    createUser();
+                } else {
+                    Toast.makeText(getActivity(), "Użytkownik nie posiada konta lub email jest niepoprawny", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                throw databaseError.toException();
+            }
+        });
     }
 
     @Override

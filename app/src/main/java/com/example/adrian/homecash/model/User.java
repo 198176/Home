@@ -12,9 +12,11 @@ public class User implements Serializable {
     private int id;
     private String name;
     private int color;
+    private String mail;
 
-    public User(String name, int color) {
+    public User(String name, String mail, int color) {
         this.name = name;
+        this.mail = mail;
         this.color = color;
     }
 
@@ -40,5 +42,13 @@ public class User implements Serializable {
 
     public void setColor(int color) {
         this.color = color;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 }

@@ -26,6 +26,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -103,13 +105,20 @@ public class SignInActivity extends AppCompatActivity implements
                             Toast.makeText(SignInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-                            FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
-                            String[] nameUser = firebaseUser.getDisplayName().split(" ");
-                            UserDBUtils.insert(new User(nameUser[0], firebaseUser.getEmail(), 0xFF1976D2));
+                            saveUser();
                             startActivity(new Intent(SignInActivity.this, MainActivity.class));
                             finish();
                         }
                     }
                 });
+    }
+
+    private void saveUser() {
+        FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
+        String[] nameUser = firebaseUser.getDisplayName().split(" ");
+        String email = firebaseUser.getEmail();
+        UserDBUtils.insert(new User(nameUser[0], email, 0xFF1976D2));
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child("users").child(firebaseUser.getUid()).child("email").setValue(email);
     }
 }
