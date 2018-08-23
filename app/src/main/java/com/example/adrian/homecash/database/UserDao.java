@@ -17,13 +17,13 @@ public interface UserDao {
     List<User> getAll();
 
     @Query("SELECT * FROM Users WHERE id = :id")
-    User getUser(int id);
+    User getUser(String id);
 
     @Query("SELECT COUNT(*) FROM (SELECT * FROM Users WHERE mail = :mail)")
     int getCountUserByEmail(String mail);
 
     @Query("SELECT COUNT(*) FROM (SELECT user_id, paying_id FROM Payments, Participants WHERE user_id = :id OR paying_id = :id)")
-    int getCountOperationsUser(int id);
+    int getCountOperationsUser(String id);
 
     @Insert
     void insert(User... payments);

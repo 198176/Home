@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,9 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.adrian.homecash.adapter.ListOperationAdapter;
 import com.example.adrian.homecash.MainActivity;
 import com.example.adrian.homecash.R;
+import com.example.adrian.homecash.adapter.ListOperationAdapter;
 import com.example.adrian.homecash.database.DBCallbackCursor;
 import com.example.adrian.homecash.database.PaymentDBUtils;
 
@@ -42,11 +43,16 @@ public class ListPersonOperationFragment extends Fragment {
     };
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        adapter = new ListOperationAdapter();
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         view = (RecyclerView) inflater.inflate(R.layout.dialog_category, container, false);
         view.setLayoutManager(new LinearLayoutManager(getActivity()));
-        adapter = new ListOperationAdapter();
         view.setAdapter(adapter);
         return view;
     }
@@ -55,7 +61,7 @@ public class ListPersonOperationFragment extends Fragment {
     public void onStart() {
         super.onStart();
         try {
-            if (getPersonId() == -1) {
+            if (getPersonId() == null) {
                 PaymentDBUtils.getAllParticipantPaymentForAllUsers(dbCallbackCursor, getDayBilling(), MainActivity.getSpinnerDate());
             } else {
                 PaymentDBUtils.getAllParticipantPaymentByUser(dbCallbackCursor, getDayBilling(), MainActivity.getSpinnerDate(), getPersonId());

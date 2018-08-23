@@ -15,18 +15,18 @@ public class Payment {
     private double value;
     private long date;
     private int category_id;
-    private int paying_id;
+    private String paying_id;
     @Ignore
     private ArrayList<Participant> participants;
 
     @Ignore
-    public Payment(double value, int paying_id, ArrayList<Participant> participants) {
+    public Payment(double value, String paying_id, ArrayList<Participant> participants) {
         this.value = value;
         this.paying_id = paying_id;
         this.participants = participants;
     }
 
-    public Payment(String title, double value, long date, int category_id, int paying_id) {
+    public Payment(String title, double value, long date, int category_id, String paying_id) {
         this.title = title;
         this.value = value;
         this.date = date;
@@ -35,7 +35,7 @@ public class Payment {
     }
 
     @Ignore
-    public Payment(String title, Double value, long date, int category_id, int paying_id, ArrayList<Participant> participants) {
+    public Payment(String title, Double value, long date, int category_id, String paying_id, ArrayList<Participant> participants) {
         this(title, value, date, category_id, paying_id);
         this.participants = participants;
     }
@@ -80,11 +80,11 @@ public class Payment {
         this.category_id = category_id;
     }
 
-    public int getPaying_id() {
+    public String getPaying_id() {
         return paying_id;
     }
 
-    public void setPaying_id(int paying_id) {
+    public void setPaying_id(String paying_id) {
         this.paying_id = paying_id;
     }
 

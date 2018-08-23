@@ -16,10 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
-import com.example.adrian.homecash.dialog.NumbersFragment;
-import com.example.adrian.homecash.dialog.PersonDialogFragment;
 import com.example.adrian.homecash.R;
 import com.example.adrian.homecash.database.PaymentDBUtils;
+import com.example.adrian.homecash.dialog.NumbersFragment;
+import com.example.adrian.homecash.dialog.PersonDialogFragment;
 import com.example.adrian.homecash.model.Participant;
 import com.example.adrian.homecash.model.Payment;
 import com.example.adrian.homecash.model.User;
@@ -50,8 +50,8 @@ public class NewRepaymentFragment extends Fragment implements PersonDialogFragme
     Button button;
     private Unbinder unbinder;
     private FragmentManager manager;
-    private int idPaying = 0;
-    private int idParticipant = 0;
+    private String idPaying = null;
+    private String idParticipant = null;
     private int imageId;
 
     @Nullable
@@ -88,8 +88,8 @@ public class NewRepaymentFragment extends Fragment implements PersonDialogFragme
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (idPaying != 0 && idParticipant != 0) {
-                    if (idPaying != idParticipant) {
+                if (idPaying != null && idParticipant != null) {
+                    if (!idPaying.equals(idParticipant)) {
                         if (value.getText().length() != 0) {
                             if (replaceStringToDouble(value.getText().toString()) != 0) {
                                 createRepayment();

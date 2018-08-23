@@ -2,7 +2,7 @@ package com.example.adrian.homecash.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
+import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +20,7 @@ public class UserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private UserListener userListener;
     private PersonListener personListener;
-    private SparseArray<String> sparseArray;
+    private ArrayMap<String, String> sparseArray;
     private int flag = 0;
     private ArrayList<User> users;
 
@@ -32,7 +32,7 @@ public class UserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.users = users;
     }
 
-    public void setUsers(ArrayList<User> users, SparseArray<String> sparseArray) {
+    public void setUsers(ArrayList<User> users, ArrayMap<String, String> sparseArray) {
         this.users = users;
         this.sparseArray = sparseArray;
     }
@@ -85,9 +85,9 @@ public class UserAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public interface UserListener {
-        void setValue(int position, int id);
+        void setValue(int position, String id);
 
-        void setBalance(int position, int id);
+        void setBalance(int position, String id);
     }
 
     public interface PersonListener {

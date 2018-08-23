@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -38,7 +39,6 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.example.adrian.homecash.activity.DrawerActivity;
 import com.example.adrian.homecash.activity.ExpenseSplitterActivity;
 import com.example.adrian.homecash.activity.OperationActivity;
-import com.example.adrian.homecash.database.UserDBUtils;
 import com.example.adrian.homecash.dialog.PersonDialogFragment;
 import com.example.adrian.homecash.fragment.ListOperationFragment;
 import com.example.adrian.homecash.fragment.ListPersonOperationFragment;
@@ -58,7 +58,9 @@ import butterknife.Unbinder;
 public class MainActivity extends AppCompatActivity implements PersonDialogFragment.PersonListener,
         NavigationView.OnNavigationItemSelectedListener {
 
-    private static int person_id = 1;
+    @Nullable
+    private static String person_id = null;
+    private static String user_id;
     private static int dayBilling = 1;
     private static String spinner_date = "";
     @BindView(R.id.toolbar)
@@ -98,7 +100,11 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
         return spinner_date;
     }
 
-    public static int getPersonId() {
+    public static String getUserId() {
+        return user_id;
+    }
+
+    public static String getPersonId() {
         return person_id;
     }
 
@@ -117,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
             startActivity(new Intent(this, SignInActivity.class));
             finish();
         } else {
+            user_id = firebaseUser.getUid();
             String emailUser = firebaseUser.getEmail();
             String nameUser = firebaseUser.getDisplayName();
             View header = navigationView.getHeaderView(0);
@@ -155,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
         new Thread(new Runnable() {
             @Override
             public void run() {
-                setPerson(MyApplication.getHomeRoomDatabase().userDao().getUser(1));
+                setPerson(MyApplication.getHomeRoomDatabase().userDao().getUser(getUserId()));
             }
         }).start();
         person.setOnClickListener(new View.OnClickListener() {
@@ -260,12 +267,12 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
             @Override
             public void run() {
                 final double monthly, total;
-                if (person_id == -1) {
+                if (person_id == null) {
                     monthly = MyApplication.getHomeRoomDatabase().paymentDao().getMonthlyBalancePaymentsForAllUsers(dayBilling, spinner_date);
                 } else {
                     monthly = MyApplication.getHomeRoomDatabase().paymentDao().getMonthlyBalancePaymentsByUser(dayBilling, person_id, spinner_date);
                 }
-                total = MyApplication.getHomeRoomDatabase().paymentDao().getTotalBalancePayments();
+                total = MyApplication.getHomeRoomDatabase().paymentDao().getTotalBalancePayments(getUserId());
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -281,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements PersonDialogFragm
     public void setPerson(User user) {
         if (user == null) {
             person.setImageResource(R.drawable.ic_user);
-            person_id = -1;
+            person_id = null;
         } else {
             TextDrawable textDrawable = TextDrawable.builder()
                     .buildRound(Character.toString(user.getName().charAt(0)), user.getColor());

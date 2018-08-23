@@ -14,7 +14,7 @@ public abstract class UserDBUtils {
         }).start();
     }
 
-    public static void delete(final User user) {
+    public synchronized static void delete(final User user) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -23,7 +23,7 @@ public abstract class UserDBUtils {
         }).start();
     }
 
-    public static void update(final User user) {
+    public synchronized static void update(final User user) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -32,7 +32,7 @@ public abstract class UserDBUtils {
         }).start();
     }
 
-    public static void insert(final User user) {
+    public synchronized static void insert(final User user) {
         new Thread(new Runnable() {
             @Override
             public void run() {

@@ -2,29 +2,32 @@ package com.example.adrian.homecash.model;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 
 @Entity(tableName = "Users")
 public class User implements Serializable {
 
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+    @PrimaryKey
+    @NonNull
+    private String id;
     private String name;
     private int color;
     private String mail;
 
-    public User(String name, String mail, int color) {
+    public User(String id, String name, String mail, int color) {
+        this.id = id;
         this.name = name;
         this.mail = mail;
         this.color = color;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

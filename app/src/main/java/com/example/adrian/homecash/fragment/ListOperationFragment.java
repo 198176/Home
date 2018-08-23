@@ -14,13 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.adrian.homecash.adapter.ListOperationAdapter;
-import com.example.adrian.homecash.MainActivity;
-import com.example.adrian.homecash.activity.OperationActivity;
 import com.example.adrian.homecash.R;
+import com.example.adrian.homecash.activity.ExpenseSplitterActivity;
+import com.example.adrian.homecash.activity.OperationActivity;
+import com.example.adrian.homecash.adapter.ListOperationAdapter;
 import com.example.adrian.homecash.database.DBCallbackCursor;
 import com.example.adrian.homecash.database.PaymentDBUtils;
-import com.example.adrian.homecash.activity.ExpenseSplitterActivity;
 
 import static com.example.adrian.homecash.MainActivity.getDayBilling;
 import static com.example.adrian.homecash.MainActivity.getPersonId;
@@ -67,7 +66,7 @@ public class ListOperationFragment extends Fragment implements ListOperationAdap
                     PaymentDBUtils.getAllPlannedPayments(callbackCursor);
                 }
             } else {
-                if (getPersonId() == -1) {
+                if (getPersonId() == null) {
                     PaymentDBUtils.getAllPaymentsByDateForAllUsers(callbackCursor, getDayBilling(), getSpinnerDate());
                 } else {
                     PaymentDBUtils.getAllPaymentsByDateAndUser(callbackCursor, getDayBilling(), getSpinnerDate(), getPersonId());

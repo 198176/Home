@@ -15,7 +15,7 @@ public abstract class PaymentDBUtils {
         }).start();
     }
 
-    public static void getAllPaymentsByDateAndUser(final DBCallbackCursor callback, final int dayBilling, final String date, final int payingId) {
+    public static void getAllPaymentsByDateAndUser(final DBCallbackCursor callback, final int dayBilling, final String date, final String payingId) {
         new Thread(new Runnable() {
             @Override
             public synchronized void run() {
@@ -33,7 +33,7 @@ public abstract class PaymentDBUtils {
         }).start();
     }
 
-    public static void getAllParticipantPaymentByUser(final DBCallbackCursor callback, final int dayBilling, final String date, final int payingId) {
+    public static void getAllParticipantPaymentByUser(final DBCallbackCursor callback, final int dayBilling, final String date, final String payingId) {
         new Thread(new Runnable() {
             @Override
             public synchronized void run() {
@@ -51,11 +51,11 @@ public abstract class PaymentDBUtils {
         }).start();
     }
 
-    public static void getPositiveSummaryPaymentsCategories(final DBCallbackCursor callback, final int dayBilling, final String date, final int payingId) {
+    public static void getPositiveSummaryPaymentsCategories(final DBCallbackCursor callback, final int dayBilling, final String date, final String payingId) {
         new Thread(new Runnable() {
             @Override
             public synchronized void run() {
-                if (payingId == -1) {
+                if (payingId == null) {
                     callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao()
                             .getPositiveSummaryPaymentsCategoriesForAllUsers(dayBilling, date));
                 } else {
@@ -66,11 +66,11 @@ public abstract class PaymentDBUtils {
         }).start();
     }
 
-    public static void getNegativeSummaryPaymentsCategories(final DBCallbackCursor callback, final int dayBilling, final String date, final int payingId) {
+    public static void getNegativeSummaryPaymentsCategories(final DBCallbackCursor callback, final int dayBilling, final String date, final String payingId) {
         new Thread(new Runnable() {
             @Override
             public synchronized void run() {
-                if (payingId == -1) {
+                if (payingId == null) {
                     callback.onCallback(MyApplication.getHomeRoomDatabase().paymentDao()
                             .getNegativeSummaryPaymentsCategoriesForAllUsers(dayBilling, date));
                 } else {
@@ -81,7 +81,7 @@ public abstract class PaymentDBUtils {
         }).start();
     }
 
-    public static void getArrearsUsers(final DBCallbackCursor callback){
+    public static void getArrearsUsers(final DBCallbackCursor callback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -90,7 +90,7 @@ public abstract class PaymentDBUtils {
         }).start();
     }
 
-    public static void getRepaymentsUsers(final DBCallbackCursor callback){
+    public static void getRepaymentsUsers(final DBCallbackCursor callback) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -108,7 +108,7 @@ public abstract class PaymentDBUtils {
         }).start();
     }
 
-    public static void updatePaymentsCategoryIdByCategory(final int id){
+    public static void updatePaymentsCategoryIdByCategory(final int id) {
         new Thread(new Runnable() {
             @Override
             public void run() {

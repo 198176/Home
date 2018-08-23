@@ -17,12 +17,13 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.example.adrian.homecash.MainActivity;
 import com.example.adrian.homecash.MyApplication;
-import com.example.adrian.homecash.dialog.NumbersFragment;
 import com.example.adrian.homecash.R;
 import com.example.adrian.homecash.database.ParticipantDBUtils;
 import com.example.adrian.homecash.database.PaymentDBUtils;
 import com.example.adrian.homecash.dialog.CategoryDialogFragment;
+import com.example.adrian.homecash.dialog.NumbersFragment;
 import com.example.adrian.homecash.model.Category;
 import com.example.adrian.homecash.model.Participant;
 import com.example.adrian.homecash.model.Payment;
@@ -199,8 +200,8 @@ public class OperationActivity extends AppCompatActivity implements NumbersFragm
         }
         try {
             if (idEdit == -1) {
-                participants.add(new Participant(1, value));
-                PaymentDBUtils.insert(new Payment(title, value, dateTime.getTimeInMillis(), idCategory, 1, participants));
+                participants.add(new Participant(MainActivity.getUserId(), value));
+                PaymentDBUtils.insert(new Payment(title, value, dateTime.getTimeInMillis(), idCategory, MainActivity.getUserId(), participants));
             } else {
                 participants = payment.getParticipants();
                 participants.get(0).setUser_value(value);

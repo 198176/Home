@@ -9,7 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
+import android.util.ArrayMap;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,15 +21,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
-import com.example.adrian.homecash.dialog.CategoryDialogFragment;
+import com.example.adrian.homecash.MainActivity;
 import com.example.adrian.homecash.MyApplication;
-import com.example.adrian.homecash.dialog.NumbersFragment;
-import com.example.adrian.homecash.dialog.PersonDialogFragment;
 import com.example.adrian.homecash.R;
 import com.example.adrian.homecash.adapter.UserAdapter;
 import com.example.adrian.homecash.database.DBCallback;
 import com.example.adrian.homecash.database.PaymentDBUtils;
 import com.example.adrian.homecash.database.UserDBUtils;
+import com.example.adrian.homecash.dialog.CategoryDialogFragment;
+import com.example.adrian.homecash.dialog.NumbersFragment;
+import com.example.adrian.homecash.dialog.PersonDialogFragment;
 import com.example.adrian.homecash.model.Category;
 import com.example.adrian.homecash.model.Participant;
 import com.example.adrian.homecash.model.Payment;
@@ -81,14 +82,16 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
     private UserAdapter userAdapter;
     private FragmentManager manager;
     private double value;
-    private SparseArray<String> sparseArray = new SparseArray<>();
+    private ArrayMap<String, String> sparseArray = new ArrayMap<>();
     DBCallback<User> userDBCallback = new DBCallback<User>() {
         @Override
         public void onCallback(List<User> array) {
             userAdapter.setUsers((ArrayList<User>) array, sparseArray);
         }
     };
-    private int idCategory, idPlace, idPaying;
+    private int idCategory;
+    private String idPlace;
+    private String idPaying;
     private int idEdit = -1;
     private int place = -1;
     private Toast toast;
@@ -108,7 +111,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
         if (idEdit != -1) {
             editFields();
         } else {
-            setPaying(1);
+            setPaying(MainActivity.getUserId());
             updateDate();
             try {
                 new Thread(new Runnable() {
@@ -164,14 +167,14 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
             participant.setAdapter(userAdapter);
             userAdapter.setUserListener(new UserAdapter.UserListener() {
                 @Override
-                public void setValue(int position, int id) {
+                public void setValue(int position, String id) {
                     showNumbers();
                     place = position;
                     idPlace = id;
                 }
 
                 @Override
-                public void setBalance(int position, int id) {
+                public void setBalance(int position, String id) {
                     double value = 0.0;
                     if (sparseArray.get(id) != null) {
                         value = replaceStringToDouble(sparseArray.get(id));
@@ -197,7 +200,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
                         if (replaceStringToDouble(balance.getText().toString()) == 0.0) {
                             boolean flag = false;
                             for (int i = 0; i < sparseArray.size(); i++) {
-                                int key = sparseArray.keyAt(i);
+                                String key = sparseArray.keyAt(i);
                                 if (replaceStringToDouble(sparseArray.get(key)) >= 0.0) {
                                     flag = true;
                                 } else {
@@ -242,7 +245,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
     private void setBalance() {
         Double val = replaceStringToDouble(valueText.getText().toString());
         for (int i = 0; i < sparseArray.size(); i++) {
-            int key = sparseArray.keyAt(i);
+            String key = sparseArray.keyAt(i);
             val -= replaceStringToDouble(sparseArray.get(key));
         }
         balance.setText(replaceDoubleToString(val));
@@ -281,7 +284,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
         personDialogFragment.show(manager, "Person");
     }
 
-    private void setPaying(final int id) {
+    private void setPaying(final String id) {
         try {
             new Thread(new Runnable() {
                 @Override
@@ -306,7 +309,7 @@ public class ExpenseSplitterActivity extends AppCompatActivity implements Number
         try {
             ArrayList<Participant> participants = new ArrayList<>();
             for (int i = 0; i < sparseArray.size(); i++) {
-                int key = sparseArray.keyAt(i);
+                String key = sparseArray.keyAt(i);
                 double number = replaceStringToDouble(sparseArray.get(key));
                 if (number == 0.0) {
                     continue;

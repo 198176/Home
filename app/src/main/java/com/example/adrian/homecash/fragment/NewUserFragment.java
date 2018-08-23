@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
+import com.example.adrian.homecash.MainActivity;
 import com.example.adrian.homecash.MyApplication;
 import com.example.adrian.homecash.R;
 import com.example.adrian.homecash.activity.OperationActivity;
@@ -80,7 +81,12 @@ public class NewUserFragment extends Fragment {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final int count = MyApplication.getHomeRoomDatabase().userDao().getCountUserByEmail(email);
+                        final int count;
+                        if (user != null && user.getMail().equals(email)) {
+                            count = 0;
+                        } else {
+                            count = MyApplication.getHomeRoomDatabase().userDao().getCountUserByEmail(email);
+                        }
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -143,9 +149,9 @@ public class NewUserFragment extends Fragment {
         image.setImageDrawable(textdrawable);
     }
 
-    public void createUser() {
+    public void createUser(String id) {
         if (user == null) {
-            user = new User(name, email, colour);
+            user = new User(id, name, email, colour);
             UserDBUtils.insert(user);
             if (listener != null) {
                 listener.onClick(user, false);
@@ -165,7 +171,7 @@ public class NewUserFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    createUser();
+                    createUser(dataSnapshot.getChildren().iterator().next().getKey());
                 } else {
                     Toast.makeText(getActivity(), "Użytkownik nie posiada konta lub email jest niepoprawny", Toast.LENGTH_SHORT).show();
                 }
@@ -214,7 +220,7 @@ public class NewUserFragment extends Fragment {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if (count == 0 && user.getId() != 1) {
+                            if (count == 0 && user.getId() != MainActivity.getUserId()) {
                                 UserDBUtils.delete(user);
                                 if (listener != null) {
                                     listener.onClick(user, true);

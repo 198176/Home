@@ -14,7 +14,6 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
@@ -117,8 +116,9 @@ public class SignInActivity extends AppCompatActivity implements
         FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
         String[] nameUser = firebaseUser.getDisplayName().split(" ");
         String email = firebaseUser.getEmail();
-        UserDBUtils.insert(new User(nameUser[0], email, 0xFF1976D2));
+        String uid = firebaseUser.getUid();
+        UserDBUtils.insert(new User(uid, nameUser[0], email, 0xFF1976D2));
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("users").child(firebaseUser.getUid()).child("email").setValue(email);
+        databaseReference.child("users").child(uid).child("email").setValue(email);
     }
 }
